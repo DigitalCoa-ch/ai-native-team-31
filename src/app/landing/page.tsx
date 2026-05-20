@@ -11,37 +11,14 @@ export default function LandingPage() {
   positive: boolean;
 }
 
-const TICKERS = [
-  { name: 'S&P 500', symbol: '^GSPC' },
-  { name: 'NASDAQ', symbol: '^IXIC' },
-  { name: 'Gold', symbol: 'GC=F' },
-  { name: 'EUR/USD', symbol: 'EURUSD=X' },
-  { name: 'GBP/CHF', symbol: 'GBPCHF=X' },
-];
 
 async function fetchTickerData() {
   try {
-    const results = await Promise.all(
-      TICKERS.map(async (ticker) => {
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker.symbol)}?interval=1m&range=1d`;
-        const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const meta = data?.chart?.result?.[0]?.meta;
-        if (!meta) throw new Error('No meta');
-        const price = meta.regularMarketPrice ?? null;
-        const prev = meta.chartPreviousClose ?? meta.previousClose ?? null;
-        const positive = prev !== null ? price >= prev : true;
-        const changePercent =
-          price !== null && prev !== null && prev !== 0
-            ? ((price - prev) / prev) * 100
-            : null;
-        return { name: ticker.name, symbol: ticker.symbol, price, positive, changePercent };
-      })
-    );
-    return results;
+    const res = await fetch('/api/market', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    return await res.json();
   } catch {
-    return TICKERS.map((t) => ({ name: t.name, symbol: t.symbol, price: null, positive: true, changePercent: null }));
+    return [];
   }
 }
 
