@@ -125,6 +125,48 @@ async function fetchTickerData() {
         </div>
       </nav>
 
+      {/* ── Scrolling Ticker ─────────────────────── */}
+      <div style={{
+        position: 'fixed', top: '64px', left: 0, right: 0, zIndex: 99,
+        background: '#0B1C30', height: '36px', overflow: 'hidden',
+        display: 'flex', alignItems: 'center',
+        borderBottom: '1px solid rgba(0,210,255,0.08)',
+      }}>
+        <div style={{ overflow: 'hidden', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap', animation: 'scrollTicker 60s linear infinite' }}>
+            {[...Array(2)].map((_, rep) => (
+              <span key={rep} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {tickerData.map((item) => (
+                  <span key={item.symbol} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{item.name}</span>
+                    <span style={{ fontSize: '12px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", fontWeight: 600, marginLeft: '4px' }}>
+                      {item.price !== null ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}
+                    </span>
+                    <span style={{ fontSize: '11px', fontFamily: "'Roboto Mono',monospace", color: item.positive ? '#22C55E' : '#EF4444', marginLeft: '3px' }}>
+                      {item.changePercent !== null ? `${item.positive ? '+' : ''}${item.changePercent.toFixed(2)}%` : ''}
+                    </span>
+                    <span style={{ color: '#00D2FF', margin: '0 8px', fontSize: '14px', opacity: 0.5 }}>●</span>
+                  </span>
+                ))}
+                {[
+                  'Fed holds rates steady amid inflation concerns',
+                  'Gold hits 3-month high as dollar weakens',
+                  'Private equity fundraising up 12% in Q1 2026',
+                  'Swiss National Bank maintains negative rate policy',
+                  'Family office allocations to alternatives reach record high',
+                  'AI-driven wealth platforms see 340% AUM growth in 2025',
+                ].map((headline) => (
+                  <span key={headline} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#F5F7FA', fontFamily: "'Inter',sans-serif" }}>{headline}</span>
+                    <span style={{ color: '#00D2FF', margin: '0 8px', fontSize: '14px', opacity: 0.5 }}>●</span>
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── Hero Section ────────────────────────────── */}
       <section id="hero" style={{
         paddingTop: '120px', paddingBottom: '80px', paddingLeft: '2rem', paddingRight: '2rem',
