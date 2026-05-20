@@ -426,6 +426,141 @@ async function fetchTickerData() {
         </div>
       </section>
 
+      {/* ── Intelligence in Action ─────────────────── */}
+      <section style={{ padding: '80px 2rem' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <h2 style={{
+            fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 4vw, 40px)',
+            color: '#F5F7FA', textAlign: 'center', marginBottom: '0.5rem', fontWeight: 600,
+          }}>
+            Intelligence in Action
+          </h2>
+          <p style={{ textAlign: 'center', color: '#94A3B8', fontSize: '14px', marginBottom: '3rem' }}>
+            Sample AI-generated advisory reports from the FamilyOffice AI analysis engine.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            {/* Report 1 */}
+            <div style={{
+              background: 'rgba(11,28,48,0.7)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(0,210,255,0.12)',
+              borderRadius: '12px', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <div style={{ padding: '24px 24px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <h3 style={{ color: '#F5F7FA', fontSize: '15px', fontFamily: "'Playfair Display',serif", fontWeight: 500, lineHeight: 1.3, flex: 1, paddingRight: '12px' }}>
+                    Q1 2026 Portfolio Risk Assessment
+                  </h3>
+                  <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", flexShrink: 0, marginTop: '2px' }}>31 Mar 2026</span>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '12px', lineHeight: 1.7, marginBottom: '12px' }}>
+                  Current Fixed Income allocation of 22% presents elevated duration risk in the current rate environment. With the 10-year Treasury yield at 4.3%, any further upward repricing would materially impair bond portfolio marks.
+                </p>
+                <p style={{ color: '#94A3B8', fontSize: '12px', lineHeight: 1.7, position: 'relative' }}>
+                  Recommended action: initiate gradual rebalancing toward short-duration investment-grade credit (2-3 year maturity) to reduce rate sensitivity. Consider reducing high-yield exposure by 4% and increasing liquidity buffer by 2%.
+                </p>
+              </div>
+              <div style={{
+                position: 'relative', marginTop: 'auto',
+                background: 'linear-gradient(to bottom, rgba(11,28,48,0) 0%, rgba(11,28,48,0.95) 50%)',
+                padding: '40px 24px 20px',
+              }}>
+                <a href="/login" style={{
+                  display: 'block', textAlign: 'center',
+                  background: 'rgba(0,210,255,0.1)', border: '1px solid rgba(0,210,255,0.25)',
+                  color: '#00D2FF', fontSize: '12px', fontWeight: 500,
+                  padding: '10px 20px', borderRadius: '6px',
+                  transition: 'all 0.2s',
+                }}>
+                  Request Full Access
+                </a>
+              </div>
+            </div>
+
+            {/* Report 2 */}
+            <div style={{
+              background: 'rgba(11,28,48,0.7)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(0,210,255,0.12)',
+              borderRadius: '12px', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <div style={{ padding: '24px 24px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <h3 style={{ color: '#F5F7FA', fontSize: '15px', fontFamily: "'Playfair Display',serif", fontWeight: 500, lineHeight: 1.3, flex: 1, paddingRight: '12px' }}>
+                    Estate Document Analysis: Whitmore Family Trust
+                  </h3>
+                  <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", flexShrink: 0, marginTop: '2px' }}>14 Feb 2026</span>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '12px', lineHeight: 1.7, marginBottom: '12px' }}>
+                  Clause 7.3(b) of the Trust Deed dated 12 September 2019 conflicts with the beneficiary allocation framework established in the Fourth Amendment dated 3 March 2023. This creates ambiguous distribution waterfall instructions for the trustee.
+                </p>
+                <p style={{ color: '#94A3B8', fontSize: '12px', lineHeight: 1.7, position: 'relative' }}>
+                  Recommended action: engage external family wealth counsel to prepare a deed of clarification or rectifying deed prior to Q2 distribution event. Flag for next quarterly family governance meeting.
+                </p>
+              </div>
+              <div style={{
+                position: 'relative', marginTop: 'auto',
+                background: 'linear-gradient(to bottom, rgba(11,28,48,0) 0%, rgba(11,28,48,0.95) 50%)',
+                padding: '40px 24px 20px',
+              }}>
+                <a href="/login" style={{
+                  display: 'block', textAlign: 'center',
+                  background: 'rgba(0,210,255,0.1)', border: '1px solid rgba(0,210,255,0.25)',
+                  color: '#00D2FF', fontSize: '12px', fontWeight: 500,
+                  padding: '10px 20px', borderRadius: '6px',
+                  transition: 'all 0.2s',
+                }}>
+                  Request Full Access
+                </a>
+              </div>
+            </div>
+
+            {/* Report 3 */}
+            <div style={{
+              background: 'rgba(11,28,48,0.7)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(0,210,255,0.12)',
+              borderRadius: '12px', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <div style={{ padding: '24px 24px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <h3 style={{ color: '#F5F7FA', fontSize: '15px', fontFamily: "'Playfair Display',serif", fontWeight: 500, lineHeight: 1.3, flex: 1, paddingRight: '12px' }}>
+                    Currency Exposure Report: EUR/CHF Hedging Strategy
+                  </h3>
+                  <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", flexShrink: 0, marginTop: '2px' }}>10 Apr 2026</span>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '12px', lineHeight: 1.7, marginBottom: '12px' }}>
+                  Portfolio analysis identifies 23% of total AUM held in EUR-denominated assets without corresponding hedging instruments. Given EUR/CHF volatility and the SNB's continued negative rate policy, unhedged exposure represents significant tail risk.
+                </p>
+                <p style={{ color: '#94A3B8', fontSize: '12px', lineHeight: 1.7, position: 'relative' }}>
+                  Recommended action: implement rolling 3-month EUR/CHF forward contracts to hedge 70% of exposure, reducing tail risk while maintaining upside optionality. Coordinate with custodian on ISDA documentation.
+                </p>
+              </div>
+              <div style={{
+                position: 'relative', marginTop: 'auto',
+                background: 'linear-gradient(to bottom, rgba(11,28,48,0) 0%, rgba(11,28,48,0.95) 50%)',
+                padding: '40px 24px 20px',
+              }}>
+                <a href="/login" style={{
+                  display: 'block', textAlign: 'center',
+                  background: 'rgba(0,210,255,0.1)', border: '1px solid rgba(0,210,255,0.25)',
+                  color: '#00D2FF', fontSize: '12px', fontWeight: 500,
+                  padding: '10px 20px', borderRadius: '6px',
+                  transition: 'all 0.2s',
+                }}>
+                  Request Full Access
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ── Security ─────────────────────────────── */}
       <section id="security" style={{
         padding: '80px 2rem', background: 'rgba(11,28,48,0.4)',
