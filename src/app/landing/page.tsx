@@ -78,52 +78,6 @@ async function fetchTickerData() {
 
       `}</style>
 
-      {/* ── Scrolling News Ticker ───────────────── */}
-      <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 101,
-        background: '#0B1C30',
-        height: '36px', overflow: 'hidden',
-        display: 'flex', alignItems: 'center',
-        borderBottom: '1px solid rgba(0,210,255,0.08)',
-      }}>
-        <div style={{ overflow: 'hidden', flex: 1 }}>
-          <div className="ticker-tape">
-            {/* Duplicate for seamless loop */}
-            {[...Array(2)].map((_, rep) => (
-              <span key={rep} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                {/* Live prices */}
-                {tickerData.map((item) => (
-                  <span key={item.symbol} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                    <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{item.name}</span>
-                    <span style={{ fontSize: '12px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", fontWeight: 600, marginLeft: '4px' }}>
-                      {item.price !== null ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}
-                    </span>
-                    <span style={{ fontSize: '11px', fontFamily: "'Roboto Mono',monospace", color: item.positive ? '#22C55E' : '#EF4444', marginLeft: '3px' }}>
-                      {item.changePercent !== null ? `${item.positive ? '+' : ''}${item.changePercent.toFixed(2)}%` : ''}
-                    </span>
-                    <span className="ticker-sep">●</span>
-                  </span>
-                ))}
-                {/* Headlines */}
-                {[
-                  'Fed holds rates steady amid inflation concerns',
-                  'Gold hits 3-month high as dollar weakens',
-                  'Private equity fundraising up 12% in Q1 2026',
-                  'Swiss National Bank maintains negative rate policy',
-                  'Family office allocations to alternatives reach record high',
-                  'AI-driven wealth platforms see 340% AUM growth in 2025',
-                ].map((headline) => (
-                  <span key={headline} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                    <span style={{ fontSize: '12px', color: '#F5F7FA', fontFamily: "'Inter',sans-serif" }}>{headline}</span>
-                    <span className="ticker-sep">●</span>
-                  </span>
-                ))}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* ── Sticky Nav ─────────────────────────────── */}
       <nav style={{
         position: 'fixed', top: '36px', left: 0, right: 0, zIndex: 100,
@@ -171,39 +125,9 @@ async function fetchTickerData() {
         </div>
       </nav>
 
-      {/* ── Market Ticker Bar ─────────────────────── */}
-      <div style={{
-        position: 'fixed', top: '100px', left: 0, right: 0, zIndex: 99,
-        background: 'rgba(11,28,48,0.95)', backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(0,210,255,0.06)',
-        padding: '0 2rem', height: '40px',
-        display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto',
-      }}>
-        {tickerData.map((item) => (
-          <div key={item.symbol} className={`ticker-pill ${item.positive ? 'positive' : 'negative'}`}>
-            <span style={{ fontSize: '11px', fontWeight: 500, opacity: 0.8 }}>{item.name}</span>
-            <span style={{ fontSize: '12px', fontFamily: "'Roboto Mono',monospace", fontWeight: 600, color: '#F5F7FA' }}>
-              {item.price !== null
-                ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                : '—'}
-            </span>
-            <span style={{ fontSize: '11px', fontFamily: "'Roboto Mono',monospace", color: item.positive ? '#22C55E' : '#EF4444' }}>
-              {item.changePercent !== null
-                ? `${item.positive ? '+' : ''}${item.changePercent.toFixed(2)}%`
-                : '—'}
-            </span>
-          </div>
-        ))}
-        {lastUpdated && (
-          <span style={{ marginLeft: 'auto', fontSize: '10px', color: '#94A3B8', flexShrink: 0, fontFamily: "'Roboto Mono',monospace" }}>
-            Updated {lastUpdated}
-          </span>
-        )}
-      </div>
-
       {/* ── Hero Section ────────────────────────────── */}
       <section id="hero" style={{
-        paddingTop: '176px', paddingBottom: '80px', paddingLeft: '2rem', paddingRight: '2rem',
+        paddingTop: '120px', paddingBottom: '80px', paddingLeft: '2rem', paddingRight: '2rem',
         textAlign: 'center', position: 'relative', overflow: 'hidden',
       }}>
         {/* Grid bg */}

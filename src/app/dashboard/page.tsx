@@ -4,6 +4,112 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 
+interface TickerItem {
+  name: string;
+  symbol: string;
+  price: number | null;
+  changePercent: number | null;
+  positive: boolean;
+}
+
+async function fetchTickerData(): Promise<TickerItem[]> {
+  try {
+    const res = await fetch('/api/market', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+function TickerBar() {
+  const [tickerData, setTickerData] = useState<TickerItem[]>([]);
+  const [lastUpdated, setLastUpdated] = useState('');
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchTickerData();
+      setTickerData(data);
+      setLastUpdated(new Date().toLocaleTimeString('en-US', { hour12: false }));
+    }
+    load();
+    const id = setInterval(load, 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  const HEALINES = [
+    'Fed holds rates steady amid inflation concerns',
+    'Gold hits 3-month high as dollar weakens',
+    'Private equity fundraising up 12% in Q1 2026',
+    'Swiss National Bank maintains negative rate policy',
+    'Family office allocations to alternatives reach record high',
+    'AI-driven wealth platforms see 340% AUM growth in 2025',
+  ];
+
+  return (
+    <>
+      {/* Scrolling news + prices bar */}
+      <div style={{
+        position: 'fixed', top: '64px', left: 0, right: 0, zIndex: 99,
+        background: '#0B1C30', height: '36px', overflow: 'hidden',
+        display: 'flex', alignItems: 'center',
+        borderBottom: '1px solid rgba(0,210,255,0.08)',
+      }}>
+        <div style={{ overflow: 'hidden', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap', animation: 'scrollTicker 60s linear infinite' }}>
+            {[...Array(2)].map((_, rep) => (
+              <span key={rep} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {tickerData.map((item) => (
+                  <span key={item.symbol} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{item.name}</span>
+                    <span style={{ fontSize: '12px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", fontWeight: 600, marginLeft: '4px' }}>
+                      {item.price !== null ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}
+                    </span>
+                    <span style={{ fontSize: '11px', fontFamily: "'Roboto Mono',monospace", color: item.positive ? '#22C55E' : '#EF4444', marginLeft: '3px' }}>
+                      {item.changePercent !== null ? `${item.positive ? '+' : ''}${item.changePercent.toFixed(2)}%` : ''}
+                    </span>
+                    <span style={{ color: '#00D2FF', margin: '0 8px', fontSize: '14px', opacity: 0.5 }}>●</span>
+                  </span>
+                ))}
+                {HEALINES.map((h) => (
+                  <span key={h} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: '#F5F7FA', fontFamily: "'Inter',sans-serif" }}>{h}</span>
+                    <span style={{ color: '#00D2FF', margin: '0 8px', fontSize: '14px', opacity: 0.5 }}>●</span>
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Market ticker pills bar */}
+      <div style={{
+        position: 'fixed', top: '100px', left: 0, right: 0, zIndex: 98,
+        background: 'rgba(11,28,48,0.95)', backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(0,210,255,0.06)',
+        padding: '0 2rem', height: '40px',
+        display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto',
+      }}>
+        {tickerData.map((item) => (
+          <div key={item.symbol} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 14px', borderRadius: '20px', border: '1px solid', borderColor: item.positive ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)', background: item.positive ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <span style={{ fontSize: '11px', fontWeight: 500, opacity: 0.8, color: '#F5F7FA' }}>{item.name}</span>
+            <span style={{ fontSize: '12px', fontFamily: "'Roboto Mono',monospace", fontWeight: 600, color: '#F5F7FA' }}>
+              {item.price !== null ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}
+            </span>
+            <span style={{ fontSize: '11px', fontFamily: "'Roboto Mono',monospace", color: item.positive ? '#22C55E' : '#EF4444' }}>
+              {item.changePercent !== null ? `${item.positive ? '+' : ''}${item.changePercent.toFixed(2)}%` : '—'}
+            </span>
+          </div>
+        ))}
+        {lastUpdated && (
+          <span style={{ marginLeft: 'auto', fontSize: '10px', color: '#94A3B8', flexShrink: 0, fontFamily: "'Roboto Mono',monospace" }}>Updated {lastUpdated}</span>
+        )}
+      </div>
+    </>
+  );
+}
+
 const PORTFOLIO = [
   { name: 'Public Equities', value: 42, color: '#00D2FF' },
   { name: 'Private Equity',  value: 18, color: '#22C55E' },
@@ -588,6 +694,7 @@ export default function DashboardPage() {
         .status-pip.synced { background:#22C55E; }
         .status-pip.alert  { background:#EF4444; }
         @keyframes pulse { 0%,100%{opacity:0.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
+        @keyframes scrollTicker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .badge { display:inline-block; padding:2px 10px; border-radius:12px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; }
         .badge-green { background:rgba(34,197,94,0.15); color:#22C55E; border:1px solid rgba(34,197,94,0.3); }
         .badge-amber { background:rgba(245,158,11,0.15); color:#F59E0B; border:1px solid rgba(245,158,11,0.3); }
@@ -665,7 +772,9 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main style={{ marginLeft:'224px', paddingTop:'56px' }}>
+      <TickerBar />
+
+      <main style={{ marginLeft:'224px', paddingTop:'140px' }}>
         {active === 'overview'   && <Overview userEmail={userEmail} />}
         {active === 'portfolio'  && <PortfolioView />}
         {active === 'analytics' && <AnalyticsView />}
