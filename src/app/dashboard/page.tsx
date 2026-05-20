@@ -349,7 +349,7 @@ function MetricCard({ label, value, status }: { label:string; value:string; stat
   );
 }
 
-function Overview({ userEmail, chartRange }: { userEmail: string; chartRange: string }) {
+function Overview({ userEmail, chartRange, onChartRange }: { userEmail: string; chartRange: string; onChartRange: (r: string) => void }) {
   return (
     <>
       <div style={{ padding:'40px 32px 24px', borderBottom:'1px solid rgba(0,210,255,0.06)' }}>
@@ -361,7 +361,7 @@ function Overview({ userEmail, chartRange }: { userEmail: string; chartRange: st
         <p style={{ fontSize:'14px', color:'#94A3B8' }}>Your wealth intelligence overview — May 2026.</p>
       </div>
       <div style={{ padding:'0 32px 24px' }}>
-        <Card><SectionTitle>Portfolio Performance — 12 Months</SectionTitle><AUMChart range={chartRange} /></Card>
+        <Card><SectionTitle>Portfolio Performance — 12 Months</SectionTitle><AUMChart range={chartRange} onRange={onChartRange} /></Card>
       </div>
       <div style={{ padding:'0 32px 24px', display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'16px' }}>
         <MetricCard label="Total AUM" value="$847.3M" status="live" />
@@ -964,7 +964,7 @@ export default function DashboardPage() {
       <TickerBar />
 
       <main style={{ marginLeft:'224px', paddingTop:'104px' }}>
-        {active === 'overview'   && <Overview userEmail={userEmail} chartRange={chartRange} />}
+        {active === 'overview'   && <Overview userEmail={userEmail} chartRange={chartRange} onChartRange={onChartRange} />}
         {active === 'portfolio'  && <PortfolioView chartRange={chartRange} onChartRange={onChartRange} />}
         {active === 'analytics' && <AnalyticsView />}
         {active === 'documents' && <DocumentsView />}
