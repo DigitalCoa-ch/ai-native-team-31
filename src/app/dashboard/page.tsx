@@ -321,10 +321,39 @@ function AdvisorsView() {
 
 
 function SimulateView() {
+  const [trustDoc, setTrustDoc] = useState(`Section 4.1: No principal distribution to beneficiaries under age 35. Section 4.2: No single equity position may exceed 25% of portfolio. Section 4.3: If VIX above 25 for 10 consecutive days, move 30% into bonds or cash. Section 4.4: Any rebalancing above 15% of AUM requires written client consent before execution.`);
+  const [portfolioData, setPortfolioData] = useState(`AAPL: 40% ($3,200,000)\nTSLA: 40% ($3,200,000)\nCash: 20% ($1,600,000)\nTotal AUM: $8,000,000`);
+  const [riskProfile, setRiskProfile] = useState(`Mr. Whitmore called today. He cannot stomach more volatility and wants capital preserved for his three children under 30. He does not want to sell AAPL. He is unaware his children are under 35 and legally ineligible for principal distributions under the trust.`);
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%', background: 'rgba(3,20,39,0.6)', border: '1px solid rgba(0,210,255,0.15)',
+    borderRadius: '8px', color: '#F5F7FA', fontSize: '13px', fontFamily: "'Roboto Mono',monospace",
+    padding: '14px 16px', resize: 'vertical' as const, lineHeight: 1.6, outline: 'none',
+  };
+
   return (
-    <div style={{ padding:'32px' }}>
+    <div style={{ padding: '32px', maxWidth: '800px' }}>
       <h2 style={{ fontSize:'24px', fontFamily:"'Playfair Display',serif", color:'#F5F7FA', marginBottom:'4px' }}>AI Synthesis Prototype</h2>
-      <p style={{ fontSize:'14px', color:'#94A3B8' }}>Wealth Conflict Detection Demo</p>
+      <p style={{ fontSize:'14px', color:'#94A3B8', marginBottom:'32px' }}>Wealth Conflict Detection Demo</p>
+
+      <div style={{ display:'flex', flexDirection:'column', gap:'24px' }}>
+        <div>
+          <label style={{ display:'block', fontSize:'11px', color:'#00D2FF', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'8px', fontFamily:"'Roboto Mono',monospace" }}>INPUT 1 — Trust Document</label>
+          <textarea value={trustDoc} onChange={(e) => setTrustDoc(e.target.value)} style={{ ...inputStyle, height:'120px' }} />
+        </div>
+        <div>
+          <label style={{ display:'block', fontSize:'11px', color:'#00D2FF', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'8px', fontFamily:"'Roboto Mono',monospace" }}>INPUT 2 — Portfolio Data</label>
+          <textarea value={portfolioData} onChange={(e) => setPortfolioData(e.target.value)} style={{ ...inputStyle, height:'100px' }} />
+        </div>
+        <div>
+          <label style={{ display:'block', fontSize:'11px', color:'#00D2FF', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'8px', fontFamily:"'Roboto Mono',monospace" }}>INPUT 3 — Client Risk Profile</label>
+          <textarea value={riskProfile} onChange={(e) => setRiskProfile(e.target.value)} style={{ ...inputStyle, height:'100px' }} />
+        </div>
+      </div>
+
+      <button style={{ marginTop:'28px', background:'rgba(0,210,255,0.12)', border:'1px solid rgba(0,210,255,0.3)', color:'#00D2FF', fontSize:'13px', fontWeight:600, padding:'12px 28px', borderRadius:'6px', cursor:'pointer', fontFamily:"'Inter',sans-serif", letterSpacing:'0.05em' }}>
+        Analyze — Detect Conflicts
+      </button>
     </div>
   );
 }
