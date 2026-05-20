@@ -17,7 +17,7 @@ export default function LoginPage() {
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     if (email && password) {
-      window.location.href = '/';
+      window.location.href = '/dashboard';
     } else {
       setError('Please enter your credentials.');
       setLoading(false);
