@@ -751,7 +751,7 @@ function TaxStrategyView() {
   return (
     <div style={{ padding: "32px" }}>
       <div style={{ marginBottom: "24px" }}>
-        <h2 style={{ fontSize: "24px", fontFamily: "'Playfair Display',serif", color: "#00D2FF", marginBottom: "4px", textShadow: "0 0 20px rgba(0,210,255,0.5)" }}>Tax Strategy — LIVE</h2>
+        <h2 style={{ fontSize: "24px", fontFamily: "'Playfair Display',serif", color: "#00D2FF", marginBottom: "4px", textShadow: "0 0 20px rgba(0,210,255,0.5)" }}>TAX STRATEGY v1.1.3 — LIVE</h2>
         <p style={{ fontSize: "14px", color: "#94A3B8" }}>AI-Powered Tax Optimization</p>
       </div>
 
