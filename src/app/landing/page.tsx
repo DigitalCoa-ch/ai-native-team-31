@@ -1,8 +1,64 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function LandingPage() {
+  interface TickerItem {
+  name: string;
+  symbol: string;
+  price: number | null;
+  changePercent: number | null;
+  positive: boolean;
+}
+
+const TICKERS = [
+  { name: 'S&P 500', symbol: '^GSPC' },
+  { name: 'NASDAQ', symbol: '^IXIC' },
+  { name: 'Gold', symbol: 'GC=F' },
+  { name: 'EUR/USD', symbol: 'EURUSD=X' },
+  { name: 'GBP/CHF', symbol: 'GBPCHF=X' },
+];
+
+async function fetchTickerData() {
+  try {
+    const results = await Promise.all(
+      TICKERS.map(async (ticker) => {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker.symbol)}?interval=1m&range=1d`;
+        const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const meta = data?.chart?.result?.[0]?.meta;
+        if (!meta) throw new Error('No meta');
+        const price = meta.regularMarketPrice ?? null;
+        const prev = meta.chartPreviousClose ?? meta.previousClose ?? null;
+        const positive = prev !== null ? price >= prev : true;
+        const changePercent =
+          price !== null && prev !== null && prev !== 0
+            ? ((price - prev) / prev) * 100
+            : null;
+        return { name: ticker.name, symbol: ticker.symbol, price, positive, changePercent };
+      })
+    );
+    return results;
+  } catch {
+    return TICKERS.map((t) => ({ name: t.name, symbol: t.symbol, price: null, positive: true, changePercent: null }));
+  }
+}
+
+  const [tickerData, setTickerData] = useState<TickerItem[]>([]);
+  const [lastUpdated, setLastUpdated] = useState('');
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchTickerData();
+      setTickerData(data);
+      setLastUpdated(new Date().toLocaleTimeString('en-US', { hour12: false }));
+    }
+    load();
+    const id = setInterval(load, 30000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div style={{
       background: '#031427',
@@ -33,6 +89,10 @@ export default function LandingPage() {
           to { opacity: 1; transform: translateY(0); }
         }
         .fade-up { animation: fadeUp 0.6s ease-out forwards; }
+        .ticker-pill { display:flex; align-items:center; gap:6px; padding:4px 14px; border-radius:20px; border:1px solid; white-space:nowrap; flex-shrink:0; }
+        .ticker-pill.positive { border-color:rgba(34,197,94,0.3); background:rgba(34,197,94,0.08); }
+        .ticker-pill.negative { border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.08); }
+
       `}</style>
 
       {/* ── Sticky Nav ─────────────────────────────── */}
@@ -81,6 +141,36 @@ export default function LandingPage() {
           </a>
         </div>
       </nav>
+
+      {/* ── Market Ticker Bar ─────────────────────── */}
+      <div style={{
+        position: 'fixed', top: '64px', left: 0, right: 0, zIndex: 99,
+        background: 'rgba(11,28,48,0.95)', backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(0,210,255,0.06)',
+        padding: '0 2rem', height: '40px',
+        display: 'flex', alignItems: 'center', gap: '12px', overflowX: 'auto',
+      }}>
+        {tickerData.map((item) => (
+          <div key={item.symbol} className={`ticker-pill ${item.positive ? 'positive' : 'negative'}`}>
+            <span style={{ fontSize: '11px', fontWeight: 500, opacity: 0.8 }}>{item.name}</span>
+            <span style={{ fontSize: '12px', fontFamily: "'Roboto Mono',monospace", fontWeight: 600, color: '#F5F7FA' }}>
+              {item.price !== null
+                ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                : '—'}
+            </span>
+            <span style={{ fontSize: '11px', fontFamily: "'Roboto Mono',monospace", color: item.positive ? '#22C55E' : '#EF4444' }}>
+              {item.changePercent !== null
+                ? `${item.positive ? '+' : ''}${item.changePercent.toFixed(2)}%`
+                : '—'}
+            </span>
+          </div>
+        ))}
+        {lastUpdated && (
+          <span style={{ marginLeft: 'auto', fontSize: '10px', color: '#94A3B8', flexShrink: 0, fontFamily: "'Roboto Mono',monospace" }}>
+            Updated {lastUpdated}
+          </span>
+        )}
+      </div>
 
       {/* ── Hero Section ────────────────────────────── */}
       <section id="hero" style={{
