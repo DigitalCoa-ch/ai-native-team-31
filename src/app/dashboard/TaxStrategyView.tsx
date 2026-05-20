@@ -122,7 +122,7 @@ export default function TaxStrategyView() {
 
       <div style={{ marginTop: "20px" }}>
         <button onClick={generate} disabled={phase === "loading"}
-          style={{ padding: "10px 28px", background: "rgba(0,210,255,0.15)", border: "1px solid rgba(0,210,255,0.35)", color: "#00D2FF", fontSize: "13px", fontFamily: "'Roboto Mono',monospace", borderRadius: "6px", cursor: phase === "loading" ? "not-allowed" : "pointer", opacity: phase === "loading" ? 0.7 : 1, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          style={{ padding: "10px 28px", background: "rgba(0,210,255,0.15)", border: "1px solid rgba(0,210,255,0.35)", color: "#FF0000", fontSize: "13px", fontFamily: "'Roboto Mono',monospace", borderRadius: "6px", cursor: phase === "loading" ? "not-allowed" : "pointer", opacity: phase === "loading" ? 0.7 : 1, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
           {phase === "loading" ? `AI is analyzing ${form.clientName}'s tax profile across ${form.jurisdiction} regulations...` : "Generate Strategy"}
         </button>
       </div>
@@ -131,13 +131,13 @@ export default function TaxStrategyView() {
         <div style={{ marginTop: "28px", display: "flex", flexDirection: "column", gap: "14px" }}>
           {visibleSections >= 1 && (
             <div style={{ ...cs, borderLeft: "3px solid #00D2FF" }}>
-              <div style={{ fontSize: "11px", color: "#00D2FF", fontFamily: "'Roboto Mono',monospace", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Client Summary</div>
+              <div style={{ fontSize: "11px", color: "#FF0000", fontFamily: "'Roboto Mono',monospace", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Client Summary</div>
               <p style={{ fontSize: "13px", color: "#F5F7FA", lineHeight: 1.7 }}>{output.summary}</p>
             </div>
           )}
           {visibleSections >= 2 && (
             <div style={{ ...cs, borderLeft: "3px solid #00D2FF" }}>
-              <div style={{ fontSize: "11px", color: "#00D2FF", fontFamily: "'Roboto Mono',monospace", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Estimated Tax Liability ({form.jurisdiction})</div>
+              <div style={{ fontSize: "11px", color: "#FF0000", fontFamily: "'Roboto Mono',monospace", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Estimated Tax Liability ({form.jurisdiction})</div>
               <div style={{ fontSize: "22px", fontFamily: "'Roboto Mono',monospace", fontWeight: 700, color: "#F5F7FA" }}>{output.liability}</div>
             </div>
           )}
@@ -146,7 +146,7 @@ export default function TaxStrategyView() {
             return (
               <div key={i} style={{ ...cs, borderLeft: "3px solid #00D2FF" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px", flexWrap: "wrap", gap: "8px" }}>
-                  <div style={{ fontSize: "12px", color: "#00D2FF", fontFamily: "'Roboto Mono',monospace", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Recommendation {i + 1}</div>
+                  <div style={{ fontSize: "12px", color: "#FF0000", fontFamily: "'Roboto Mono',monospace", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Recommendation {i + 1}</div>
                   <div style={{ fontSize: "11px", fontFamily: "'Roboto Mono',monospace", color: "#22C55E", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: "4px", padding: "2px 8px" }}>{rec.saving}</div>
                 </div>
                 <div style={{ fontSize: "14px", color: "#F5F7FA", fontWeight: 600, marginBottom: "6px", fontFamily: "'Playfair Display',serif" }}>{rec.title}</div>
