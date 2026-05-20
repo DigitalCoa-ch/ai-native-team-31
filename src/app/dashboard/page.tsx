@@ -634,11 +634,21 @@ export default function DashboardPage() {
         padding:'0 24px', zIndex:30,
       }}>
         <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          <a href="/landing" style={{ fontSize:12, color:'#94A3B8', textDecoration:'none', display:'flex', alignItems:'center', gap:4, transition:'color 0.2s' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#00D2FF')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}>
+            ← Home
+          </a>
+          <span style={{ color:'rgba(0,210,255,0.15)', fontSize:12 }}>|</span>
           <h1 style={{ fontSize:14, fontFamily:"'Playfair Display',serif", color:'#F5F7FA' }}>Command Center</h1>
           <span style={{ color:'#94A3B8', fontSize:12 }}>|</span>
           <span style={{ fontSize:12, color:'#94A3B8', fontFamily:"'Roboto Mono',monospace" }}>{now}</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+          <button style={{ padding:'6px 14px', borderRadius:5, background:'transparent', border:'1px solid rgba(239,68,68,0.25)', color:'rgba(239,68,68,0.7)', fontSize:12, cursor:'pointer', fontFamily:"'Inter',sans-serif", letterSpacing:'0.04em', transition:'all 0.2s' }}
+            onClick={() => { window.location.href = '/landing'; }}>
+            Log Out
+          </button>
           <button style={{ padding:8, borderRadius:6, background:'transparent', border:'none', cursor:'pointer', position:'relative' }}>
             <span style={{ fontSize:14 }}>X</span>
             <span style={{ position:'absolute', top:4, right:4, width:8, height:8, background:'#EF4444', borderRadius:'50%' }} />
