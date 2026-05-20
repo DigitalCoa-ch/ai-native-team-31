@@ -284,14 +284,158 @@ function Overview({ userEmail }: { userEmail: string }) {
   );
 }
 
+interface Holding {
+  name: string;
+  ticker: string;
+  shares: number;
+  avgBuy: number;
+}
+
+interface Quote {
+  ticker: string;
+  price: number | null;
+  change: number | null;
+}
+
+const HOLDINGS: Holding[] = [
+  { name: 'NVIDIA',            ticker: 'NVDA', shares: 10000, avgBuy: 45   },
+  { name: 'Apple',             ticker: 'AAPL', shares: 8500,  avgBuy: 142  },
+  { name: 'Tesla',             ticker: 'TSLA', shares: 4200,  avgBuy: 210  },
+  { name: 'Blackstone',        ticker: 'BX',   shares: 3100,  avgBuy: 88   },
+  { name: 'Microsoft',         ticker: 'MSFT', shares: 2800,  avgBuy: 310  },
+  { name: 'Vanguard Bond ETF', ticker: 'BND',  shares: 5000,  avgBuy: 72   },
+  { name: 'Gold ETF',          ticker: 'GLD',  shares: 1200,  avgBuy: 168  },
+];
+const CASH_USD = 191100;
+
+function fmt(v: number | null, dec = 2) {
+  if (v === null) return '—';
+  return v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+function green(v: number | null) { return v !== null && v >= 0; }
+function red(v: number | null)   { return v !== null && v < 0; }
+
 function PortfolioView() {
+  const [quotes, setQuotes] = useState<Record<string, Quote>>({});
+  const [stale, setStale] = useState(false);
+  const [search, setSearch] = useState('');
+  const [lastFetch, setLastFetch] = useState<Date | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      setStale(false);
+      try {
+        const r = await fetch('/api/stocks', { cache: 'no-store' });
+        if (!r.ok) throw new Error();
+        const data: Record<string, Quote> = await r.json();
+        setQuotes(data);
+        setStale(false);
+        setLastFetch(new Date());
+      } catch {
+        setStale(true);
+      }
+    }
+    load();
+    const id = setInterval(load, 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  const rows = HOLDINGS.map((h) => {
+    const q = quotes[h.ticker] ?? { ticker: h.ticker, price: null, change: null };
+    const price = q.price;
+    const value = price !== null ? price * h.shares : null;
+    const pnl = price !== null ? (price - h.avgBuy) * h.shares : null;
+    const pnlPct = price !== null ? ((price - h.avgBuy) / h.avgBuy) * 100 : null;
+    return { ...h, price, value, pnl, pnlPct, dayChange: q.change };
+  });
+
+  const filtered = rows.filter((r) => {
+    const q = search.toLowerCase();
+    return !q || r.name.toLowerCase().includes(q) || r.ticker.toLowerCase().includes(q);
+  });
+
+  const cashRow = { name: 'Cash (USD)', ticker: '—', shares: '—', avgBuy: '—', price: null, value: CASH_USD, pnl: 0, pnlPct: 0, dayChange: null };
+  const allRows = [...filtered, cashRow];
+
+  const totalValue = rows.reduce((s, r) => s + (r.value ?? 0), 0) + CASH_USD;
+  const totalPnL   = rows.reduce((s, r) => s + (r.pnl ?? 0), 0);
+
+  const inputStyle: React.CSSProperties = {
+    background: 'rgba(3,20,39,0.6)', border: '1px solid rgba(0,210,255,0.15)',
+    borderRadius: '6px', color: '#F5F7FA', fontSize: '13px',
+    fontFamily: "'Roboto Mono',monospace", padding: '8px 12px', outline: 'none', width: '240px',
+  };
+
   return (
-    <div style={{ padding:'32px' }}>
-      <div style={{ marginBottom:'24px' }}>
-        <h2 style={{ fontSize:'24px', fontFamily:"'Playfair Display',serif", color:'#F5F7FA', marginBottom:'4px' }}>Portfolio</h2>
-        <p style={{ fontSize:'14px', color:'#94A3B8' }}>Asset class breakdown and performance history.</p>
+    <div style={{ padding: '32px' }}>
+      <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h2 style={{ fontSize: '24px', fontFamily: "'Playfair Display',serif", color: '#F5F7FA', marginBottom: '4px' }}>Portfolio</h2>
+          <p style={{ fontSize: '14px', color: '#94A3B8' }}>Asset class breakdown and performance history.</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or ticker..."
+            style={inputStyle}
+          />
+          {lastFetch && (
+            <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", whiteSpace: 'nowrap' }}>
+              Live · {lastFetch.toLocaleTimeString('en-US', { hour12: false })}
+            </span>
+          )}
+        </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'16px' }}>
+
+      {stale && (
+        <div style={{ marginBottom: '12px', padding: '8px 12px', background: 'rgba(148,163,184,0.08)', border: '1px solid rgba(148,163,184,0.15)', borderRadius: '6px', fontSize: '11px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>
+          Live prices unavailable — showing last known data
+        </div>
+      )}
+
+      <div style={{ background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0,210,255,0.12)', borderRadius: '12px', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '780px' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(0,210,255,0.1)' }}>
+                {['Asset', 'Ticker', 'Shares', 'Avg Buy', 'Live Price', 'Total Value', 'P&L ($)', 'P&L (%)', '1D Change'].map((h) => (
+                  <th key={h} style={{ textAlign: 'right', padding: '10px 14px', fontSize: '10px', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 400, whiteSpace: 'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {allRows.map((r, i) => {
+                const isCash = r.ticker === '—';
+                const p = green(r.pnl) ? '#22C55E' : red(r.pnl) ? '#EF4444' : '#F5F7FA';
+                const d = green(r.dayChange) ? '#22C55E' : red(r.dayChange) ? '#EF4444' : '#F5F7FA';
+                return (
+                  <tr key={r.ticker} style={{ borderBottom: i < allRows.length - 1 ? '1px solid rgba(0,210,255,0.05)' : 'none', background: isCash ? 'rgba(0,210,255,0.03)' : 'transparent' }}>
+                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontWeight: isCash ? 600 : 400 }}>{r.name}</td>
+                    <td style={{ padding: '10px 14px', fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{r.ticker}</td>
+                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.shares === '—' ? '—' : Number(r.shares).toLocaleString()}</td>
+                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.avgBuy === '—' ? '—' : `$${Number(r.avgBuy).toLocaleString()}`}</td>
+                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.price !== null ? `$${fmt(r.price)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.value !== null ? `$${fmt(r.value)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                    <td style={{ padding: '10px 14px', fontSize: '13px', color: p, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.pnl !== null ? `${r.pnl >= 0 ? '+' : ''}$${fmt(r.pnl)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                    <td style={{ padding: '10px 14px', fontSize: '13px', color: p, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.pnlPct !== null ? `${r.pnlPct >= 0 ? '+' : ''}${fmt(r.pnlPct)}%` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                    <td style={{ padding: '10px 14px', fontSize: '13px', color: d, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.dayChange !== null ? `${r.dayChange >= 0 ? '+' : ''}${fmt(r.dayChange)}%` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                  </tr>
+                );
+              })}
+              {/* Summary row */}
+              <tr style={{ borderTop: '2px solid rgba(0,210,255,0.2)', background: 'rgba(0,210,255,0.04)' }}>
+                <td colSpan={5} style={{ padding: '12px 14px', fontSize: '12px', fontWeight: 700, color: '#F5F7FA', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Portfolio</td>
+                <td style={{ padding: '12px 14px', fontSize: '14px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 700 }}>${fmt(totalValue)}</td>
+                <td style={{ padding: '12px 14px', fontSize: '14px', color: totalPnL >= 0 ? '#22C55E' : '#EF4444', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 700 }}>{totalPnL >= 0 ? '+' : ''}$${fmt(totalPnL)}</td>
+                <td colSpan={2} />
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         <Card><SectionTitle>Asset Allocation</SectionTitle><DonutChart /></Card>
         <Card><SectionTitle>Performance History</SectionTitle><AUMChart /></Card>
       </div>
