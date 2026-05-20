@@ -404,7 +404,42 @@ function fmt(v: number | null, dec = 2) {
 function green(v: number | null) { return v !== null && v >= 0; }
 function red(v: number | null)   { return v !== null && v < 0; }
 
+function TradeRow({ type, date, asset, ticker, shares, price, total, status }: { type: 'Buy'|'Sell'; date: string; asset: string; ticker: string; shares: number; price: number; total: number; status: 'Filled'|'Pending' }) {
+  const tc = type === 'Buy' ? '#22C55E' : '#F59E0B';
+  const sc = status === 'Filled' ? '#94A3B8' : '#F59E0B';
+  return (
+    <tr style={{ borderBottom: '1px solid rgba(0,210,255,0.05)' }}>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{date}</td>
+      <td style={{ padding: '9px 14px', fontSize: '12px', fontWeight: 600, color: tc }}>{type}</td>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#F5F7FA' }}>{asset}</td>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{ticker}</td>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#F5F7FA', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{shares.toLocaleString()}</td>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>${price.toFixed(2)}</td>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#F5F7FA', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>${total.toLocaleString()}</td>
+      <td style={{ padding: '9px 14px', fontSize: '11px', color: sc, fontFamily: "'Roboto Mono',monospace" }}>{status}</td>
+    </tr>
+  );
+}
+
+function DecisionRow({ date, suggestion, asset, reasoning, risk, decision }: { date: string; suggestion: string; asset: string; reasoning: string; risk: 'Low'|'Medium'|'High'; decision: 'Approved'|'Declined' }) {
+  const rc = risk === 'High' ? '#EF4444' : risk === 'Medium' ? '#F59E0B' : '#22C55E';
+  const dc = decision === 'Approved' ? '#22C55E' : '#EF4444';
+  return (
+    <tr style={{ borderBottom: '1px solid rgba(0,210,255,0.05)' }}>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{date}</td>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#F5F7FA', maxWidth: '200px' }}>{suggestion}</td>
+      <td style={{ padding: '9px 14px', fontSize: '12px', color: '#00D2FF' }}>{asset}</td>
+      <td style={{ padding: '9px 14px', fontSize: '11px', color: '#94A3B8', maxWidth: '180px' }}>{reasoning}</td>
+      <td style={{ padding: '9px 14px', fontSize: '11px', fontWeight: 600, color: rc }}>{risk}</td>
+      <td style={{ padding: '9px 14px', fontSize: '11px', fontWeight: 600 }}>
+        <span style={{ padding: '2px 8px', borderRadius: '12px', background: `${dc}18`, border: `1px solid ${dc}44`, color: dc }}>{decision}</span>
+      </td>
+    </tr>
+  );
+}
+
 function PortfolioView({ chartRange, onChartRange }: { chartRange: string; onChartRange: (r: string) => void }) {
+  const [tab, setTab] = useState<'holdings' | 'trade' | 'decisions'>('holdings');
   const [quotes, setQuotes] = useState<Record<string, Quote>>({});
   const [stale, setStale] = useState(false);
   const [search, setSearch] = useState('');
@@ -469,60 +504,114 @@ function PortfolioView({ chartRange, onChartRange }: { chartRange: string; onCha
             placeholder="Search by name or ticker..."
             style={inputStyle}
           />
-          {lastFetch && (
-            <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", whiteSpace: 'nowrap' }}>
-              Live · {lastFetch.toLocaleTimeString('en-US', { hour12: false })}
-            </span>
-          )}
-        </div>
+
+      {/* ── Tab bar ─────────────────────── */}
+      <div style={{ display: 'flex', gap: '2px', marginBottom: '16px', borderBottom: '1px solid rgba(0,210,255,0.1)' }}>
+        {(['holdings','trade','decisions'] as const).map((t) => (
+          <button key={t} onClick={() => setTab(t)}
+            style={{ padding: '8px 18px', fontSize: '12px', fontFamily: "'Roboto Mono',monospace", fontWeight: t === tab ? 600 : 400, color: t === tab ? '#00D2FF' : '#94A3B8', background: 'transparent', border: 'none', borderBottom: t === tab ? '2px solid #00D2FF' : '2px solid transparent', cursor: 'pointer', textTransform: 'capitalize', letterSpacing: '0.04em', marginBottom: '-1px', transition: 'all 0.15s' }}>
+            {t === 'trade' ? 'Trade History' : t === 'decisions' ? 'Decision History' : 'Holdings'}
+          </button>
+        ))}
       </div>
 
-      {stale && (
-        <div style={{ marginBottom: '12px', padding: '8px 12px', background: 'rgba(148,163,184,0.08)', border: '1px solid rgba(148,163,184,0.15)', borderRadius: '6px', fontSize: '11px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>
-          Live prices unavailable — showing last known data
-        </div>
+      {/* ── Holdings table ─────────────── */}
+      {tab === 'holdings' && (
+        <>
+          {stale && (
+            <div style={{ marginBottom: '12px', padding: '8px 12px', background: 'rgba(148,163,184,0.08)', border: '1px solid rgba(148,163,184,0.15)', borderRadius: '6px', fontSize: '11px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>
+              Live prices unavailable — showing last known data
+            </div>
+          )}
+          <div style={{ background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0,210,255,0.12)', borderRadius: '12px', overflow: 'hidden' }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '780px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(0,210,255,0.1)' }}>
+                    {['Asset', 'Ticker', 'Shares', 'Avg Buy', 'Live Price', 'Total Value', 'P&L ($)', 'P&L (%)', '1D Change'].map((h) => (
+                      <th key={h} style={{ textAlign: 'right', padding: '10px 14px', fontSize: '10px', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 400, whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {allRows.map((r, i) => {
+                    const isCash = r.ticker === '—';
+                    const p = green(r.pnl) ? '#22C55E' : red(r.pnl) ? '#EF4444' : '#F5F7FA';
+                    const d = green(r.dayChange) ? '#22C55E' : red(r.dayChange) ? '#EF4444' : '#F5F7FA';
+                    return (
+                      <tr key={r.ticker} style={{ borderBottom: i < allRows.length - 1 ? '1px solid rgba(0,210,255,0.05)' : 'none', background: isCash ? 'rgba(0,210,255,0.03)' : 'transparent' }}>
+                        <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontWeight: isCash ? 600 : 400 }}>{r.name}</td>
+                        <td style={{ padding: '10px 14px', fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{r.ticker}</td>
+                        <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.shares === '—' ? '—' : Number(r.shares).toLocaleString()}</td>
+                        <td style={{ padding: '10px 14px', fontSize: '13px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.avgBuy === '—' ? '—' : `$${Number(r.avgBuy).toLocaleString()}`}</td>
+                        <td style={{ padding: '10px 14px', fontSize: '13px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.price !== null ? `$${fmt(r.price)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                        <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.value !== null ? `$${fmt(r.value)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                        <td style={{ padding: '10px 14px', fontSize: '13px', color: p, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.pnl !== null ? `${r.pnl >= 0 ? '+' : ''}$${fmt(r.pnl)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                        <td style={{ padding: '10px 14px', fontSize: '13px', color: p, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.pnlPct !== null ? `${r.pnlPct >= 0 ? '+' : ''}${fmt(r.pnlPct)}%` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                        <td style={{ padding: '10px 14px', fontSize: '13px', color: d, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.dayChange !== null ? `${r.dayChange >= 0 ? '+' : ''}${fmt(r.dayChange)}%` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
+                      </tr>
+                    );
+                  })}
+                  <tr style={{ borderTop: '2px solid rgba(0,210,255,0.2)', background: 'rgba(0,210,255,0.04)' }}>
+                    <td colSpan={5} style={{ padding: '12px 14px', fontSize: '12px', fontWeight: 700, color: '#F5F7FA', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Portfolio</td>
+                    <td style={{ padding: '12px 14px', fontSize: '14px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 700 }}>${fmt(totalValue)}</td>
+                    <td style={{ padding: '12px 14px', fontSize: '14px', color: totalPnL >= 0 ? '#22C55E' : '#EF4444', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 700 }}>{totalPnL >= 0 ? '+' : ''}$${fmt(totalPnL)}</td>
+                    <td colSpan={2} />
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
-      <div style={{ background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0,210,255,0.12)', borderRadius: '12px', overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '780px' }}>
+      {/* ── Trade History table ────────── */}
+      {tab === 'trade' && (
+        <div style={{ background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0,210,255,0.12)', borderRadius: '12px', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '640px' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(0,210,255,0.1)' }}>
-                {['Asset', 'Ticker', 'Shares', 'Avg Buy', 'Live Price', 'Total Value', 'P&L ($)', 'P&L (%)', '1D Change'].map((h) => (
+                {['Date','Type','Asset','Ticker','Shares','Price','Total Value','Status'].map((h) => (
                   <th key={h} style={{ textAlign: 'right', padding: '10px 14px', fontSize: '10px', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 400, whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {allRows.map((r, i) => {
-                const isCash = r.ticker === '—';
-                const p = green(r.pnl) ? '#22C55E' : red(r.pnl) ? '#EF4444' : '#F5F7FA';
-                const d = green(r.dayChange) ? '#22C55E' : red(r.dayChange) ? '#EF4444' : '#F5F7FA';
-                return (
-                  <tr key={r.ticker} style={{ borderBottom: i < allRows.length - 1 ? '1px solid rgba(0,210,255,0.05)' : 'none', background: isCash ? 'rgba(0,210,255,0.03)' : 'transparent' }}>
-                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontWeight: isCash ? 600 : 400 }}>{r.name}</td>
-                    <td style={{ padding: '10px 14px', fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>{r.ticker}</td>
-                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.shares === '—' ? '—' : Number(r.shares).toLocaleString()}</td>
-                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.avgBuy === '—' ? '—' : `$${Number(r.avgBuy).toLocaleString()}`}</td>
-                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.price !== null ? `$${fmt(r.price)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
-                    <td style={{ padding: '10px 14px', fontSize: '13px', color: '#F5F7FA', fontFamily: "'Roboto Mono',monospace", textAlign: 'right' }}>{r.value !== null ? `$${fmt(r.value)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
-                    <td style={{ padding: '10px 14px', fontSize: '13px', color: p, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.pnl !== null ? `${r.pnl >= 0 ? '+' : ''}$${fmt(r.pnl)}` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
-                    <td style={{ padding: '10px 14px', fontSize: '13px', color: p, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.pnlPct !== null ? `${r.pnlPct >= 0 ? '+' : ''}${fmt(r.pnlPct)}%` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
-                    <td style={{ padding: '10px 14px', fontSize: '13px', color: d, fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 600 }}>{r.dayChange !== null ? `${r.dayChange >= 0 ? '+' : ''}${fmt(r.dayChange)}%` : <span style={{ color: '#94A3B8' }}>—</span>}</td>
-                  </tr>
-                );
-              })}
-              {/* Summary row */}
-              <tr style={{ borderTop: '2px solid rgba(0,210,255,0.2)', background: 'rgba(0,210,255,0.04)' }}>
-                <td colSpan={5} style={{ padding: '12px 14px', fontSize: '12px', fontWeight: 700, color: '#F5F7FA', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total Portfolio</td>
-                <td style={{ padding: '12px 14px', fontSize: '14px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 700 }}>${fmt(totalValue)}</td>
-                <td style={{ padding: '12px 14px', fontSize: '14px', color: totalPnL >= 0 ? '#22C55E' : '#EF4444', fontFamily: "'Roboto Mono',monospace", textAlign: 'right', fontWeight: 700 }}>{totalPnL >= 0 ? '+' : ''}$${fmt(totalPnL)}</td>
-                <td colSpan={2} />
-              </tr>
+              <TradeRow type="Buy"  date="2026-05-19" asset="NVIDIA"           ticker="NVDA" shares={200}  price={221.85} total={44_370}   status="Filled" />
+              <TradeRow type="Sell" date="2026-05-17" asset="Apple"            ticker="AAPL" shares={500}  price={300.42} total={150_210} status="Filled" />
+              <TradeRow type="Buy"  date="2026-05-14" asset="Tesla"           ticker="TSLA" shares={150}  price={408.10} total={61_215}   status="Filled" />
+              <TradeRow type="Buy"  date="2026-05-10" asset="Vanguard Bond ETF" ticker="BND"  shares={1000} price={72.34}  total={72_340}   status="Filled" />
+              <TradeRow type="Sell" date="2026-05-08" asset="Gold ETF"         ticker="GLD"  shares={80}   price={415.60} total={33_248}   status="Filled" />
+              <TradeRow type="Buy"  date="2026-05-05" asset="NVIDIA"           ticker="NVDA" shares={300}  price={198.40} total={59_520}   status="Filled" />
+              <TradeRow type="Sell" date="2026-05-02" asset="Tesla"           ticker="TSLA" shares={80}   price={395.20} total={31_616}   status="Filled" />
+              <TradeRow type="Buy"  date="2026-04-29" asset="Apple"            ticker="AAPL" shares={200}  price={285.70} total={57_140}   status="Filled" />
             </tbody>
           </table>
         </div>
-      </div>
+      )}
+
+      {/* ── Decision History table ─────── */}
+      {tab === 'decisions' && (
+        <div style={{ background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0,210,255,0.12)', borderRadius: '12px', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '720px' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(0,210,255,0.1)' }}>
+                {['Date','AI Suggestion','Asset','Reasoning','Risk Level','Advisor Decision'].map((h) => (
+                  <th key={h} style={{ textAlign: 'right', padding: '10px 14px', fontSize: '10px', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 400, whiteSpace: 'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <DecisionRow date="2026-05-18" suggestion="Reduce TSLA position"    asset="Tesla"      reasoning="Concentration risk — §4.2 mandate"       risk="High"   decision="Declined" />
+              <DecisionRow date="2026-05-14" suggestion="Increase BND allocation" asset="BND ETF"   reasoning="Capital preservation — mandate §4.3"       risk="Low"    decision="Approved" />
+              <DecisionRow date="2026-05-12" suggestion="Hedge EUR exposure"     asset="FX Hedge"  reasoning="Currency risk — mandate §4.5"           risk="Medium" decision="Approved" />
+              <DecisionRow date="2026-05-08" suggestion="Sell AAPL 15%"          asset="Apple"     reasoning="Portfolio rebalancing — mandate §4.2"   risk="Medium" decision="Declined" />
+              <DecisionRow date="2026-05-04" suggestion="Move 10% to cash"        asset="USD Cash"  reasoning="VIX elevated — mandate §4.1"             risk="Low"    decision="Approved" />
+              <DecisionRow date="2026-05-01" suggestion="Review trust distribution" asset="Trust"     reasoning="Legal review — §4.1 clause eligibility"  risk="Low"    decision="Approved" />
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <div style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         <Card><SectionTitle>Asset Allocation</SectionTitle><DonutChart /></Card>
