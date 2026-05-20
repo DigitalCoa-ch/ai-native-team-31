@@ -735,7 +735,7 @@ function TaxStrategyView() {
     const rePct = parseNum(form.realEstate);
     const cashPct = parseNum(form.cash);
     const aum = parseNum(form.aum);
-    const rl = riskLevel(eqPct);
+    const rl = riskLevel(eqPct) || "High";
     const liability = estimateTax(form.jurisdiction, aum);
     const recs = buildRecs(form.jurisdiction, eqPct, aum, cashPct, form.clientName);
     setOutput({ summary: `${form.clientName} is a high-net-worth individual with total assets of $${aum.toLocaleString("en-US")}, resident in ${form.jurisdiction}. Portfolio: ${eqPct}% equities, ${rePct}% real estate, ${cashPct}% cash. Tax year ${form.taxYear}. Concerns: ${form.concerns}. ${eqPct > 70 ? "Growth-oriented" : eqPct > 40 ? "Balanced" : "Conservative"} strategy with ${rl.toLowerCase()} risk.`, liability, recommendations: recs, riskLevel: rl, note: `Strategy tailored to ${form.clientName}'s current allocation and estate structure as of ${form.taxYear}.` });
@@ -751,7 +751,7 @@ function TaxStrategyView() {
   return (
     <div style={{ padding: "32px" }}>
       <div style={{ marginBottom: "24px" }}>
-        <h2 style={{ fontSize: "24px", fontFamily: "'Playfair Display',serif", color: "#F5F7FA", marginBottom: "4px" }}>Tax Strategy</h2>
+        <h2 style={{ fontSize: "24px", fontFamily: "'Playfair Display',serif", color: "#00D2FF", marginBottom: "4px", textShadow: "0 0 20px rgba(0,210,255,0.5)" }}>Tax Strategy — LIVE</h2>
         <p style={{ fontSize: "14px", color: "#94A3B8" }}>AI-Powered Tax Optimization</p>
       </div>
 
