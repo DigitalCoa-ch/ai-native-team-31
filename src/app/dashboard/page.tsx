@@ -150,36 +150,67 @@ function DonutChart() {
   );
 }
 
-function AUMChart() {
+function AUMChart({ range, onRange }: { range: string; onRange: (r: string) => void }) {
+  const ALL_DATA = [
+    // 1D — 8 hourly points starting 09:30
+    { data: Array.from({ length: 8 }, (_, i) => ({ label: `${9+i*1}h`, aum: 840 + Math.sin(i * 0.8) * 3 })), label: '09:30' },
+    // 1W — 7 daily points
+    { data: [{ label:'Mon',  aum:835 },{ label:'Tue',  aum:841 },{ label:'Wed',  aum:838 },{ label:'Thu',  aum:844 },{ label:'Fri',  aum:847 },{ label:'Sat',  aum:847.3 },{ label:'Sun',  aum:847.3 }], label: 'Mon' },
+    // 1M — 4 weekly points
+    { data: [{ label:'W1', aum:828 },{ label:'W2', aum:834 },{ label:'W3', aum:841 },{ label:'W4', aum:847.3 }], label: 'W1' },
+    // 3M — 13 weekly points (seeded)
+    { data: (() => { const seed=[835,841,828,845,832,851,839,855,843,860,848,853,847.3]; return seed.map((v,i)=>({label:`W${i+1}`,aum:v})); })(), label: 'W1' },
+    // 6M — 26 bi-weekly seeded points
+    { data: (() => { const s=[712,728,745,731,763,779,795,808,821,835,841,847,843,855,849,858,851,847,841,838,845,851,844,849,846,847.3]; return s.map((v,i)=>({label:`M${i+1}`,aum:v})); })(), label: 'M1' },
+    // 1Y — 12 monthly points (MONTHLY_AUM)
+    { data: MONTHLY_AUM, label: 'Jun' },
+    // YTD — 5 monthly points through May
+    { data: [{ label:'Jan',aum:808 },{ label:'Feb',aum:821 },{ label:'Mar',aum:835 },{ label:'Apr',aum:841 },{ label:'May',aum:847.3 }], label: 'Jan' },
+    // All — full 12 months
+    { data: MONTHLY_AUM, label: 'Jun' },
+  ];
+  const RANGES = ['1D','1W','1M','3M','6M','1Y','YTD','All'];
+  const idx = RANGES.indexOf(range);
+  const data = idx >= 0 ? ALL_DATA[idx].data : ALL_DATA[5].data;
+
   const w = 520, h = 180, pad = { top:10, right:20, bottom:30, left:55 };
   const iw = w - pad.left - pad.right, ih = h - pad.top - pad.bottom;
-  const data = MONTHLY_AUM;
-  const minV = Math.min(...data.map(d => d.aum)) * 0.98;
-  const maxV = Math.max(...data.map(d => d.aum)) * 1.02;
-  const xOf = (i: number) => pad.left + (i / (data.length - 1)) * iw;
+  const minV = Math.min(...data.map(d => d.aum)) * 0.97;
+  const maxV = Math.max(...data.map(d => d.aum)) * 1.03;
+  const xOf = (i: number) => pad.left + (data.length === 1 ? iw / 2 : i / (data.length - 1)) * iw;
   const yOf = (v: number) => pad.top + ih - ((v - minV) / (maxV - minV)) * ih;
   const pts = data.map((d, i) => `${xOf(i)},${yOf(d.aum)}`).join(' ');
   const area = [pts, `${xOf(data.length-1)},${pad.top+ih}`, `${xOf(0)},${pad.top+ih}`].join(' ');
 
   return (
-    <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow:'visible' }}>
-      <defs>
-        <linearGradient id="aumGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#00D2FF" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#00D2FF" stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      <polyline points={area} fill="url(#aumGrad)" />
-      <polyline points={pts} fill="none" stroke="#00D2FF" strokeWidth="2" strokeLinejoin="round" />
-      {data.map((d, i) => (
-        <g key={i}>
-          <circle cx={xOf(i)} cy={yOf(d.aum)} r="3" fill="#00D2FF" />
-          <text x={xOf(i)} y={h-4} textAnchor="middle" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">{d.month}</text>
-        </g>
-      ))}
-      <text x={pad.left-4} y={pad.top} textAnchor="end" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">${maxV}M</text>
-      <text x={pad.left-4} y={pad.top+ih} textAnchor="end" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">${minV.toFixed(0)}M</text>
-    </svg>
+    <div>
+      <div style={{ display: 'flex', gap: '2px', marginBottom: '12px' }}>
+        {RANGES.map((r) => (
+          <button key={r} onClick={() => onRange(r)}
+            style={{ background: r === range ? 'rgba(0,210,255,0.15)' : 'transparent', border: `1px solid ${r === range ? 'rgba(0,210,255,0.4)' : 'rgba(0,210,255,0.1)'}`, color: r === range ? '#00D2FF' : '#94A3B8', fontSize: '11px', fontFamily: "'Roboto Mono',monospace", padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: r === range ? 600 : 400, letterSpacing:'0.04em', transition:'all 0.15s' }}>
+            {r}
+          </button>
+        ))}
+      </div>
+      <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow:'visible' }}>
+        <defs>
+          <linearGradient id="aumGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#00D2FF" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#00D2FF" stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        <polyline points={area} fill="url(#aumGrad)" />
+        <polyline points={pts} fill="none" stroke="#00D2FF" strokeWidth="2" strokeLinejoin="round" />
+        {data.map((d, i) => (
+          <g key={i}>
+            <circle cx={xOf(i)} cy={yOf(d.aum)} r="3" fill="#00D2FF" />
+            <text x={xOf(i)} y={h-4} textAnchor="middle" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">{d.label}</text>
+          </g>
+        ))}
+        <text x={pad.left-4} y={pad.top} textAnchor="end" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">${maxV.toFixed(0)}M</text>
+        <text x={pad.left-4} y={pad.top+ih} textAnchor="end" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">${minV.toFixed(0)}M</text>
+      </svg>
+    </div>
   );
 }
 
@@ -260,7 +291,7 @@ function MetricCard({ label, value, status }: { label:string; value:string; stat
   );
 }
 
-function Overview({ userEmail }: { userEmail: string }) {
+function Overview({ userEmail, chartRange }: { userEmail: string; chartRange: string }) {
   return (
     <>
       <div style={{ padding:'40px 32px 24px', borderBottom:'1px solid rgba(0,210,255,0.06)' }}>
@@ -272,7 +303,7 @@ function Overview({ userEmail }: { userEmail: string }) {
         <p style={{ fontSize:'14px', color:'#94A3B8' }}>Your wealth intelligence overview — May 2026.</p>
       </div>
       <div style={{ padding:'0 32px 24px' }}>
-        <Card><SectionTitle>Portfolio Performance — 12 Months</SectionTitle><AUMChart /></Card>
+        <Card><SectionTitle>Portfolio Performance — 12 Months</SectionTitle><AUMChart range={chartRange} /></Card>
       </div>
       <div style={{ padding:'0 32px 24px', display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'16px' }}>
         <MetricCard label="Total AUM" value="$847.3M" status="live" />
@@ -315,7 +346,7 @@ function fmt(v: number | null, dec = 2) {
 function green(v: number | null) { return v !== null && v >= 0; }
 function red(v: number | null)   { return v !== null && v < 0; }
 
-function PortfolioView() {
+function PortfolioView({ chartRange, onChartRange }: { chartRange: string; onChartRange: (r: string) => void }) {
   const [quotes, setQuotes] = useState<Record<string, Quote>>({});
   const [stale, setStale] = useState(false);
   const [search, setSearch] = useState('');
@@ -437,7 +468,7 @@ function PortfolioView() {
 
       <div style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         <Card><SectionTitle>Asset Allocation</SectionTitle><DonutChart /></Card>
-        <Card><SectionTitle>Performance History</SectionTitle><AUMChart /></Card>
+        <Card><SectionTitle>Performance History</SectionTitle><AUMChart range={chartRange} onRange={onChartRange} /></Card>
       </div>
     </div>
   );
@@ -765,6 +796,7 @@ function SimulateView() {
 export default function DashboardPage() {
   const [active, setActive] = useState('overview');
   const [userEmail] = useState('j.whitmore@familyoffice.com');
+  const [chartRange, setChartRange] = useState('1Y');
   const [now, setNow] = useState('');
 
   useEffect(() => {
@@ -773,6 +805,8 @@ export default function DashboardPage() {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
+
+  const onChartRange = (r: string) => setChartRange(r);
 
   const navBtn = (view: string) => ({
     display:'flex', alignItems:'center', gap:'12px',
@@ -872,8 +906,8 @@ export default function DashboardPage() {
       <TickerBar />
 
       <main style={{ marginLeft:'224px', paddingTop:'104px' }}>
-        {active === 'overview'   && <Overview userEmail={userEmail} />}
-        {active === 'portfolio'  && <PortfolioView />}
+        {active === 'overview'   && <Overview userEmail={userEmail} chartRange={chartRange} />}
+        {active === 'portfolio'  && <PortfolioView chartRange={chartRange} onChartRange={onChartRange} />}
         {active === 'analytics' && <AnalyticsView />}
         {active === 'documents' && <DocumentsView />}
         {active === 'advisors'  && <AdvisorsView />}
