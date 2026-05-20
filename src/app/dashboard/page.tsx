@@ -102,7 +102,7 @@ const NAV_ITEMS = [
   { icon:'V',  label:'Analytics',  view:'analytics'  },
   { icon:'[]', label:'Documents', view:'documents'  },
   { icon:'O',  label:'Advisors',    view:'advisors'   },
-  { icon:'%',  label:'Tax Strategy', view:'taxstrategy' },
+  { icon:'%',  label: "Tax Strategy",
   { icon:'▶', label:'Simulate',   view:'simulate'   },
 ];
 
