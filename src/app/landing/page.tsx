@@ -61,6 +61,10 @@ async function fetchTickerData() {
           0%, 100% { opacity: 0.5; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.05); }
         }
+        @keyframes pulseLive {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -163,6 +167,115 @@ async function fetchTickerData() {
                 ))}
               </span>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── CNN-Style Market Dashboard ───────────── */}
+      <div style={{ paddingTop: '64px' }}>
+        <div style={{
+          background: 'rgba(11,28,48,0.97)',
+          borderBottom: '1px solid rgba(0,210,255,0.08)',
+          padding: '0 2rem 16px',
+          overflow: 'hidden',
+        }}>
+          {/* Panel header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0 12px', borderBottom: '1px solid rgba(0,210,255,0.06)', marginBottom: '14px' }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '5px',
+              background: '#EF4444', color: '#fff', fontSize: '9px',
+              fontFamily: "'Roboto Mono',monospace", fontWeight: 700,
+              padding: '2px 7px', borderRadius: '3px', letterSpacing: '0.1em',
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff', animation: 'pulseLive 1.2s ease-in-out infinite', display: 'inline-block' }} />
+              LIVE
+            </span>
+            <span style={{ fontSize: '11px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", textTransform: 'uppercase', letterSpacing: '0.12em' }}>Markets</span>
+            {lastUpdated && (
+              <span style={{ marginLeft: 'auto', fontSize: '10px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace" }}>
+                Updated {lastUpdated}
+              </span>
+            )}
+          </div>
+
+          {/* Market cards grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '14px' }}>
+            {tickerData.map((item) => {
+              const dollarChange = item.changePercent !== null && item.price !== null
+                ? (item.price * item.changePercent) / (100 + item.changePercent)
+                : null;
+              const sparkVals = (() => {
+                const base = item.price ?? 100;
+                return [0.98, 0.99, 1.01, 0.995, 1.005, 1.01].map((f, i) =>
+                  base * f + (item.positive ? i * 0.3 : -i * 0.3)
+                );
+              })();
+              const sparkPts = sparkVals.map((v, i) => `${i * 14},${28 - ((v - Math.min(...sparkVals)) / (Math.max(...sparkVals) - Math.min(...sparkVals) + 0.001)) * 24}`).join(' ');
+              const sparkColor = item.positive ? '#22C55E' : '#EF4444';
+              return (
+                <div key={item.symbol} style={{
+                  background: 'rgba(3,20,39,0.7)',
+                  border: '1px solid rgba(0,210,255,0.1)',
+                  borderRadius: '8px', padding: '10px 12px',
+                  transition: 'border-color 0.2s',
+                  display: 'flex', flexDirection: 'column', gap: '2px',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: "'Roboto Mono',monospace", textTransform: 'uppercase', letterSpacing: '0.08em' }}>{item.name}</span>
+                    <svg width="56" height="28" viewBox="0 0 84 28" style={{ overflow: 'visible' }}>
+                      <polyline points={sparkPts} fill="none" stroke={sparkColor} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" opacity="0.8" />
+                    </svg>
+                  </div>
+                  <div style={{ fontSize: '18px', fontFamily: "'Roboto Mono',monospace", fontWeight: 700, color: '#F5F7FA', lineHeight: 1 }}>
+                    {item.price !== null ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '11px', fontFamily: "'Roboto Mono',monospace", color: dollarChange !== null ? (dollarChange >= 0 ? '#22C55E' : '#EF4444') : '#94A3B8' }}>
+                      {dollarChange !== null ? `${dollarChange >= 0 ? '+' : ''}$${Math.abs(dollarChange).toFixed(2)}` : '—'}
+                    </span>
+                    <span style={{ fontSize: '11px', fontFamily: "'Roboto Mono',monospace", color: item.positive ? '#22C55E' : '#EF4444', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      <span style={{ fontSize: '10px' }}>{item.positive ? '▲' : '▼'}</span>
+                      {item.changePercent !== null ? `${item.changePercent >= 0 ? '+' : ''}${item.changePercent.toFixed(2)}%` : '—'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Scrolling headlines bar */}
+          <div style={{
+            background: 'rgba(3,20,39,0.5)', border: '1px solid rgba(0,210,255,0.06)',
+            borderRadius: '6px', height: '32px', overflow: 'hidden', display: 'flex', alignItems: 'center',
+          }}>
+            <div style={{
+              flexShrink: 0, display: 'flex', alignItems: 'center',
+              background: 'rgba(0,210,255,0.1)', height: '100%', padding: '0 14px',
+              borderRight: '1px solid rgba(0,210,255,0.08)',
+            }}>
+              <span style={{ fontSize: '10px', color: '#00D2FF', fontFamily: "'Roboto Mono',monospace", fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>Headlines</span>
+            </div>
+            <div style={{ overflow: 'hidden', flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap', animation: 'scrollTicker 50s linear infinite' }}>
+                {[...Array(2)].map((_, rep) => (
+                  <span key={rep} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    {[
+                      'Fed holds rates steady amid ongoing inflation concerns',
+                      'Gold hits 3-month high as dollar weakens on global trade tension',
+                      'Private equity fundraising surges 12% in Q1 2026',
+                      'Swiss National Bank maintains negative rate policy amid volatility',
+                      'Family office allocations to alternatives reach record levels',
+                      'AI-driven wealth platforms see 340% AUM growth in 2025',
+                    ].map((h) => (
+                      <span key={h} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                        <span style={{ fontSize: '11px', color: '#CBD5E1', fontFamily: "'Inter',sans-serif", padding: '0 24px' }}>{h}</span>
+                        <span style={{ color: '#00D2FF', fontSize: '10px', opacity: 0.4 }}>◆</span>
+                      </span>
+                    ))}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
