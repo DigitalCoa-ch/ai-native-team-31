@@ -151,24 +151,79 @@ function DonutChart() {
 }
 
 function AUMChart({ range, onRange }: { range: string; onRange: (r: string) => void }) {
+  // Live portfolio value ≈ $847.3M (NVDA 2.23M + AAPL 2.57M + TSLA 1.74M + BX 0.36M + MSFT 1.18M + BND 0.36M + GLD 0.50M + cash 0.19M)
+  const LIVE = 847.3;
+
+  // Seeded pseudo-random to keep data stable across re-renders
+  function seeded(seed: number, len: number, start: number, end: number, labels: string[]) {
+    let s = seed;
+    return Array.from({ length: len }, (_, i) => {
+      s = (s * 16807) % 2147483647;
+      const t = len === 1 ? 0.5 : i / (len - 1);
+      const base = start + (end - start) * t;
+      const noise = (s / 2147483647 - 0.5) * (end - start) * 0.18;
+      return { label: labels[i] ?? String(i + 1), aum: parseFloat((base + noise).toFixed(2)) };
+    });
+  }
+
   const ALL_DATA = [
-    // 1D — 8 hourly points starting 09:30
-    { data: Array.from({ length: 8 }, (_, i) => ({ label: `${9+i*1}h`, aum: 840 + Math.sin(i * 0.8) * 3 })), label: '09:30' },
-    // 1W — 7 daily points
-    { data: [{ label:'Mon',  aum:835 },{ label:'Tue',  aum:841 },{ label:'Wed',  aum:838 },{ label:'Thu',  aum:844 },{ label:'Fri',  aum:847 },{ label:'Sat',  aum:847.3 },{ label:'Sun',  aum:847.3 }], label: 'Mon' },
-    // 1M — 4 weekly points
-    { data: [{ label:'W1', aum:828 },{ label:'W2', aum:834 },{ label:'W3', aum:841 },{ label:'W4', aum:847.3 }], label: 'W1' },
-    // 3M — 13 weekly points (seeded)
-    { data: (() => { const seed=[835,841,828,845,832,851,839,855,843,860,848,853,847.3]; return seed.map((v,i)=>({label:`W${i+1}`,aum:v})); })(), label: 'W1' },
-    // 6M — 26 bi-weekly seeded points
-    { data: (() => { const s=[712,728,745,731,763,779,795,808,821,835,841,847,843,855,849,858,851,847,841,838,845,851,844,849,846,847.3]; return s.map((v,i)=>({label:`M${i+1}`,aum:v})); })(), label: 'M1' },
-    // 1Y — 12 monthly points (MONTHLY_AUM)
-    { data: MONTHLY_AUM, label: 'Jun' },
-    // YTD — 5 monthly points through May
-    { data: [{ label:'Jan',aum:808 },{ label:'Feb',aum:821 },{ label:'Mar',aum:835 },{ label:'Apr',aum:841 },{ label:'May',aum:847.3 }], label: 'Jan' },
-    // All — full 12 months
-    { data: MONTHLY_AUM, label: 'Jun' },
+    // 1D — 7 hourly intraday points (9:30am–4pm), small noise around LIVE
+    { data: (() => {
+      const opens = [843.1, 844.3, 846.8, 845.2, 847.9, 846.5, 847.3];
+      const lbls  = ['09:30','10:30','11:30','12:30','13:30','14:30','15:30'];
+      return opens.map((v,i) => ({ label: lbls[i], aum: v }));
+    })() },
+    // 1W — 7 daily points, moderate ups and downs around LIVE
+    { data: (() => {
+      const vals = [838.4, 841.9, 839.7, 843.2, 840.1, 845.8, 847.3];
+      const dys  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      return vals.map((v,i) => ({ label: dys[i], aum: v }));
+    })() },
+    // 1M — 30 daily points, visible upward trend with noise
+    { data: (() => {
+      let s = 9871;
+      const pts: { label: string; aum: number }[] = [];
+      for (let i = 0; i < 30; i++) {
+        s = (s * 16807) % 2147483647;
+        const t = i / 29;
+        const trend = 818 + 29.3 * t;
+        const noise = (s / 2147483647 - 0.5) * 8;
+        const d = new Date(2026, 3, 21 - (29 - i)); // April 21 → May 20
+        const lbl = `${d.getMonth()+1}/${d.getDate()}`;
+        pts.push({ label: lbl, aum: parseFloat((trend + noise).toFixed(2)) });
+      }
+      pts[pts.length - 1].aum = LIVE; // anchor last point to live
+      return pts;
+    })() },
+    // 3M — 13 weekly points (≈ 13 weeks in 3 months)
+    { data: seeded(54321, 13, 808, LIVE, ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13']) },
+    // 6M — 26 bi-weekly points, clear growth curve
+    { data: (() => {
+      let s = 77777;
+      return Array.from({ length: 26 }, (_, i) => {
+        s = (s * 16807) % 2147483647;
+        const t = i / 25;
+        const base = 750 + 97.3 * t;
+        const noise = (s / 2147483647 - 0.5) * 12;
+        return { label: `W${i*2+1}`, aum: parseFloat((base + noise).toFixed(2)) };
+      });
+    })() },
+    // 1Y — 12 monthly points (Jun 2025 → May 2026)
+    { data: MONTHLY_AUM },
+    // YTD — 5 monthly points Jan–May 2026
+    { data: [
+      { label:'Jan', aum:808.0 },{ label:'Feb', aum:821.4 },
+      { label:'Mar', aum:834.9 },{ label:'Apr', aum:841.2 },
+      { label:'May', aum:LIVE },
+    ] },
+    // All — 5 yearly points 2021–2025, clear long-term growth
+    { data: [
+      { label:'2021', aum:602.3 },{ label:'2022', aum:641.8 },
+      { label:'2023', aum:705.4 },{ label:'2024', aum:778.6 },
+      { label:'2025', aum:LIVE },
+    ] },
   ];
+
   const RANGES = ['1D','1W','1M','3M','6M','1Y','YTD','All'];
   const idx = RANGES.indexOf(range);
   const data = idx >= 0 ? ALL_DATA[idx].data : ALL_DATA[5].data;
@@ -201,12 +256,15 @@ function AUMChart({ range, onRange }: { range: string; onRange: (r: string) => v
         </defs>
         <polyline points={area} fill="url(#aumGrad)" />
         <polyline points={pts} fill="none" stroke="#00D2FF" strokeWidth="2" strokeLinejoin="round" />
-        {data.map((d, i) => (
-          <g key={i}>
-            <circle cx={xOf(i)} cy={yOf(d.aum)} r="3" fill="#00D2FF" />
-            <text x={xOf(i)} y={h-4} textAnchor="middle" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">{d.label}</text>
-          </g>
-        ))}
+        {data.map((d, i) => {
+          const fontSize = data.length > 20 ? '8' : data.length > 10 ? '9' : '10';
+          return (
+            <g key={i}>
+              <circle cx={xOf(i)} cy={yOf(d.aum)} r="3" fill="#00D2FF" />
+              <text x={xOf(i)} y={h-4} textAnchor="middle" fill="#94A3B8" fontSize={fontSize} fontFamily="'Roboto Mono',monospace">{d.label}</text>
+            </g>
+          );
+        })}
         <text x={pad.left-4} y={pad.top} textAnchor="end" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">${maxV.toFixed(0)}M</text>
         <text x={pad.left-4} y={pad.top+ih} textAnchor="end" fill="#94A3B8" fontSize="10" fontFamily="'Roboto Mono',monospace">${minV.toFixed(0)}M</text>
       </svg>
