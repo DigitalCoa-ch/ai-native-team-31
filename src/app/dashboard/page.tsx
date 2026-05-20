@@ -1,4 +1,4 @@
-// FamilyOffice AI — v1.1.1 — force redeploy
+// FamilyOffice AI — v1.1.2 — force new chunk hash
 'use client';
 
 export const dynamic = 'force-dynamic';
