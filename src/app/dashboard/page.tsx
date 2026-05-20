@@ -324,6 +324,9 @@ function SimulateView() {
   const [trustDoc, setTrustDoc] = useState(`Section 4.1: No principal distribution to beneficiaries under age 35. Section 4.2: No single equity position may exceed 25% of portfolio. Section 4.3: If VIX above 25 for 10 consecutive days, move 30% into bonds or cash. Section 4.4: Any rebalancing above 15% of AUM requires written client consent before execution.`);
   const [portfolioData, setPortfolioData] = useState(`AAPL: 40% ($3,200,000)\nTSLA: 40% ($3,200,000)\nCash: 20% ($1,600,000)\nTotal AUM: $8,000,000`);
   const [riskProfile, setRiskProfile] = useState(`Mr. Whitmore called today. He cannot stomach more volatility and wants capital preserved for his three children under 30. He does not want to sell AAPL. He is unaware his children are under 35 and legally ineligible for principal distributions under the trust.`);
+  const [reply, setReply] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const inputStyle: React.CSSProperties = {
     width: '100%', background: 'rgba(3,20,39,0.6)', border: '1px solid rgba(0,210,255,0.15)',
@@ -331,8 +334,34 @@ function SimulateView() {
     padding: '14px 16px', resize: 'vertical' as const, lineHeight: 1.6, outline: 'none',
   };
 
+  const handleAnalyze = async () => {
+    setLoading(true);
+    setReply('');
+    setError('');
+    setReply('AI is reading 3 data streams...');
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ trustDoc, portfolioData, riskProfile }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? `Server error ${res.status}`);
+        setReply('');
+      } else {
+        setReply(data.reply);
+      }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Request failed');
+      setReply('');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div style={{ padding: '32px', maxWidth: '800px' }}>
+    <div style={{ padding: '32px', maxWidth: '860px' }}>
       <h2 style={{ fontSize:'24px', fontFamily:"'Playfair Display',serif", color:'#F5F7FA', marginBottom:'4px' }}>AI Synthesis Prototype</h2>
       <p style={{ fontSize:'14px', color:'#94A3B8', marginBottom:'32px' }}>Wealth Conflict Detection Demo</p>
 
@@ -351,11 +380,30 @@ function SimulateView() {
         </div>
       </div>
 
-      <button style={{ marginTop:'28px', background:'rgba(0,210,255,0.12)', border:'1px solid rgba(0,210,255,0.3)', color:'#00D2FF', fontSize:'13px', fontWeight:600, padding:'12px 28px', borderRadius:'6px', cursor:'pointer', fontFamily:"'Inter',sans-serif", letterSpacing:'0.05em' }}>
-        Analyze — Detect Conflicts
+      <button
+        onClick={handleAnalyze}
+        disabled={loading}
+        style={{ marginTop:'28px', background: loading ? 'rgba(0,210,255,0.06)' : 'rgba(0,210,255,0.12)', border:'1px solid rgba(0,210,255,0.3)', color: loading ? 'rgba(0,210,255,0.4)' : '#00D2FF', fontSize:'13px', fontWeight:600, padding:'12px 28px', borderRadius:'6px', cursor: loading ? 'not-allowed' : 'pointer', fontFamily:"'Inter',sans-serif", letterSpacing:'0.05em', transition:'all 0.2s' }}>
+        {loading ? 'Analyzing...' : 'Analyze — Detect Conflicts'}
       </button>
+
+      {error && (
+        <div style={{ marginTop:'24px', padding:'14px 18px', background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.25)', borderRadius:'8px', fontSize:'13px', color:'#EF4444', fontFamily:"'Roboto Mono',monospace" }}>
+          {error}
+        </div>
+      )}
+
+      {reply && (
+        <div style={{ marginTop:'28px', background:'rgba(11,28,48,0.85)', backdropFilter:'blur(16px)', border:'1px solid rgba(0,210,255,0.12)', borderRadius:'12px', padding:'24px' }}>
+          <div style={{ fontSize:'11px', color:'#00D2FF', textTransform:'uppercase', letterSpacing:'0.15em', marginBottom:'16px', fontFamily:"'Roboto Mono',monospace" }}>Wealth Advisor Briefing</div>
+          <pre style={{ color:'#F5F7FA', fontSize:'13px', fontFamily:"'Roboto Mono',monospace", lineHeight:1.7, whiteSpace:'pre-wrap', margin:0 }}>
+            {reply}
+          </pre>
+        </div>
+      )}
     </div>
   );
+}
 }
 
 export default function DashboardPage() {
