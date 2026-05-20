@@ -4,8 +4,8 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-const TaxStrategyView = dynamic(() => import('./TaxStrategyView'), { ssr: true });
+import _dynamic from 'next/dynamic';
+const TaxStrategyView = _dynamic(() => import('./TaxStrategyView'), { ssr: true });
 
 interface TickerItem {
   name: string;
@@ -105,7 +105,7 @@ const NAV_ITEMS = [
   { icon:'V',  label:'Analytics',  view:'analytics'  },
   { icon:'[]', label:'Documents', view:'documents'  },
   { icon:'O',  label:'Advisors',    view:'advisors'   },
-  { icon:'%',  label: "Tax Strategy ✦", view: 'tax' },
+  { icon:'%',  label: "Tax Strategy ✦", view: 'taxstrategy' },
   { icon:'▶', label:'Simulate',   view:'simulate'   },
 ];
 
