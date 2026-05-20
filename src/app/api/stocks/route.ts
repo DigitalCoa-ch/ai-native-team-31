@@ -27,7 +27,7 @@ async function fetchYahoo(ticker: string): Promise<YahooQuote> {
     if (!result) throw new Error('No result');
     const meta = result.meta;
     const price = meta?.regularMarketPrice ?? null;
-    const prevClose = meta?.regularMarketPreviousClose ?? meta?.previousClose ?? null;
+    const prevClose = meta?.chartPreviousClose ?? null;
     const changePercent =
       price !== null && prevClose !== null && prevClose !== 0
         ? ((price - prevClose) / prevClose) * 100
