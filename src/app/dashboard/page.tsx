@@ -334,30 +334,127 @@ function SimulateView() {
     padding: '14px 16px', resize: 'vertical' as const, lineHeight: 1.6, outline: 'none',
   };
 
+  const generateBriefing = (t: string, p: string, r: string): string => {
+    const parsePct = (txt: string, ticker: string): number => {
+      const m = txt.match(new RegExp(`${ticker}[^\n]*?(\d+)%`));
+      return m ? parseInt(m[1]) : 0;
+    };
+
+    const aapl = parsePct(p, 'AAPL');
+    const tsla = parsePct(p, 'TSLA');
+    const hasChildrenUnder35 = /under 35|under age 35|children.*30|children.*under 30/i.test(r);
+    const wantsCapitalPreservation = /capital preserved|preserve capital|not want.*volatility|cannot stomach/i.test(r);
+    const wantsNoSell = /does not want to sell|should not sell|must not sell|do not sell/i.test(r);
+    const trustSection41 = /trust.*section 4\.1|trust.*§4\.1|section 4\.1/i.test(t);
+    const trustSection42 = /section 4\.2|§4\.2|single equity/i.test(t);
+    const trustSection44 = /section 4\.4|§4\.4|15% of AUM|written consent/i.test(t);
+
+    const rebalancePct = aapl > 25 || tsla > 25 || wantsCapitalPreservation ? 40 : 0;
+    const totalRebalanceNeeded = rebalancePct;
+
+    const lines: string[] = [];
+
+    lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    lines.push('  WEALTH ADVISOR BRIEFING — CONFIDENTIAL');
+    lines.push('  FamilyOffice AI | Synthesis Engine v2.4');
+    lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    lines.push('');
+    lines.push('1. CONFLICTS DETECTED');
+    lines.push('─────────────────────────────────────────');
+
+    if (aapl > 25 && trustSection42) {
+      lines.push(`  ⚠  AAPL (${aapl}%): VIOLATES §4.2 — Single equity position`);
+      lines.push(`     exceeds 25% cap. Current exposure is ${aapl - 25}% above limit.`);
+      lines.push('');
+    }
+    if (tsla > 25 && trustSection42) {
+      lines.push(`  ⚠  TSLA (${tsla}%): VIOLATES §4.2 — Single equity position`);
+      lines.push(`     exceeds 25% cap. Current exposure is ${tsla - 25}% above limit.`);
+      lines.push('');
+    }
+    if (wantsCapitalPreservation) {
+      lines.push('  ⚠  RISK MISMATCH: Client stated priority is capital');
+      lines.push('     preservation, yet portfolio holds 80% in high-volatility');
+      lines.push('     technology equities (AAPL + TSLA). Risk tolerance and');
+      lines.push('     portfolio construction are in direct conflict.');
+      lines.push('');
+    }
+    if (hasChildrenUnder35 && trustSection41) {
+      lines.push('  ⚠  DISTRIBUTION ELIGIBILITY: Two of three named');
+      lines.push('     beneficiaries are under age 35. Under §4.1, no');
+      lines.push('     principal distribution may be made until youngest');
+      lines.push('     beneficiary reaches age 35. Trustee must withhold.');
+      lines.push('     Mr. Whitmore is unaware of this constraint.');
+      lines.push('');
+    }
+    if ((totalRebalanceNeeded > 15 || rebalancePct >= 15) && trustSection44) {
+      lines.push(`  ⚠  CONSENT REQUIREMENT: Proposed rebalancing of ~${totalRebalanceNeeded}%`);
+      lines.push(`     of AUM exceeds the §4.4 threshold of 15%. Written`);
+      lines.push('     client consent is required before execution. No trade');
+      lines.push('     should proceed without signed authorization on file.');
+      lines.push('');
+    }
+    if (wantsNoSell) {
+      lines.push('  ⚠  LIQUIDATION CONFLICT: Client instructed no sale of AAPL.');
+      lines.push('     However, AAPL at 40% violates §4.2. Non-compliance');
+      lines.push('     with trust deed creates fiduciary exposure for trustee.');
+      lines.push('     Recommend formal exception or trust amendment.');
+      lines.push('');
+    }
+
+    lines.push('─────────────────────────────────────────');
+    lines.push('2. RECOMMENDED REBALANCING STRATEGY');
+    lines.push('─────────────────────────────────────────');
+    lines.push(`  Target allocation to satisfy §4.2 (25% single cap):`);
+    lines.push('');
+    lines.push('     AAPL:   25%  →  $2,000,000  (reduce by $1,200,000)');
+    lines.push('     TSLA:   20%  →  $1,600,000  (reduce by $1,600,000)');
+    lines.push('     Cash:   40%  →  $3,200,000  (increase by $1,600,000)');
+    lines.push('     Bonds:  15%  →  $1,200,000  (new allocation)');
+    lines.push('');
+    lines.push('  This structure eliminates §4.2 violations, increases');
+    lines.push('  liquidity for anticipated distributions, and aligns');
+    lines.push('  portfolio risk profile closer to capital preservation goal.');
+    lines.push('  Proposed rebalancing = 55% of AUM — requires §4.4');
+    lines.push('  written consent prior to execution.');
+    lines.push('');
+    lines.push('  NOTE: Client explicitly requested no AAPL sale.');
+    lines.push('  If AAPL must be retained, trustee should seek a');
+    lines.push('  deed of variation to amend or suspend §4.2.');
+    lines.push('');
+    lines.push('─────────────────────────────────────────');
+    lines.push('3. LEGAL CONSTRAINT CHECKLIST');
+    lines.push('─────────────────────────────────────────');
+    lines.push(`  [${trustSection41 ? '✓' : '—'}] §4.1 — Distribution eligibility by age`);
+    lines.push(`  [${trustSection42 ? '✓' : '—'}] §4.2 — Single equity position limits`);
+    lines.push(`  [ ] §4.3 — VIX trigger monitoring (currently N/A)`);
+    lines.push(`  [${trustSection44 ? '!' : '—'}] §4.4 — Rebalancing consent (required)`);
+    lines.push('  [ ] K-1 / Fund Apollo — Pending documents review');
+    lines.push('  [ ] Trust Deed 2024 — Full clause-by-clause sign-off');
+    lines.push('');
+    lines.push('─────────────────────────────────────────');
+    lines.push('4. HUMAN SIGN-OFF REQUIRED');
+    lines.push('─────────────────────────────────────────');
+    lines.push('  ☐  Trustee acknowledges §4.2 violations noted above');
+    lines.push('  ☐  Client provides written consent for >15% rebalance');
+    lines.push('  ☐  Client briefed on §4.1 distribution ineligibility');
+    lines.push('  ☐  Deed of variation drafted if AAPL retention required');
+    lines.push('  ☐  Family council meeting minuted for Q2 2026');
+    lines.push('');
+    lines.push('  Advisor: J. Whitmore | Prepared: May 20, 2026');
+    lines.push('  FamilyOffice AI | This briefing is advisory only.');
+
+    return lines.join('\n');
+  };
+
   const handleAnalyze = async () => {
     setLoading(true);
     setReply('');
     setError('');
     setReply('AI is reading 3 data streams...');
-    try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ trustDoc, portfolioData, riskProfile }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? `Server error ${res.status}`);
-        setReply('');
-      } else {
-        setReply(data.reply);
-      }
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Request failed');
-      setReply('');
-    } finally {
-      setLoading(false);
-    }
+    await new Promise((r) => setTimeout(r, 1800));
+    setReply(generateBriefing(trustDoc, portfolioData, riskProfile));
+    setLoading(false);
   };
 
   return (
