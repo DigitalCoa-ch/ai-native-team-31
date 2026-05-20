@@ -102,6 +102,7 @@ const NAV_ITEMS = [
   { icon:'V',  label:'Analytics',  view:'analytics'  },
   { icon:'[]', label:'Documents', view:'documents'  },
   { icon:'O',  label:'Advisors',    view:'advisors'   },
+  { icon:'%',  label:'Tax Strategy', view:'taxstrategy' },
   { icon:'▶', label:'Simulate',   view:'simulate'   },
 ];
 
@@ -673,6 +674,17 @@ function DocumentsView() {
   );
 }
 
+function TaxStrategyView() {
+  return (
+    <div style={{ padding: '32px' }}>
+      <div style={{ marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '24px', fontFamily: "'Playfair Display',serif", color: '#F5F7FA', marginBottom: '4px' }}>Tax Strategy</h2>
+        <p style={{ fontSize: '14px', color: '#94A3B8' }}>AI-Powered Tax Optimization</p>
+      </div>
+    </div>
+  );
+}
+
 function AdvisorsView() {
   return (
     <div style={{ padding:'32px' }}>
@@ -1058,6 +1070,7 @@ export default function DashboardPage() {
         {active === 'analytics' && <AnalyticsView />}
         {active === 'documents' && <DocumentsView />}
         {active === 'advisors'  && <AdvisorsView />}
+        {active === 'taxstrategy' && <TaxStrategyView />}
         {active === 'simulate' && <SimulateView />}
       </main>
     </div>
