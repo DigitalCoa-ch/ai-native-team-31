@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import NewsIntelligence from '@/components/NewsIntelligence';
 
 const METRICS = [
   { label: 'Total AUM', value: '$847.3M', status: 'live' as const },
@@ -187,56 +188,9 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Placeholder Content Area */}
-        <div style={{ padding: '0 32px 32px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
-          <div style={{
-            background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(0,210,255,0.12)', borderRadius: '12px',
-            padding: '24px',
-          }}>
-            <h3 style={{ fontSize: '14px', color: '#F5F7FA', marginBottom: '16px', fontFamily: "'Playfair Display', serif" }}>Portfolio Performance</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {['Public Equities', 'Private Equity', 'Fixed Income', 'Real Estate'].map((asset, i, arr) => (
-                <div key={asset} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '13px', color: '#F5F7FA' }}>{asset}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '120px', height: '4px', background: 'rgba(0,210,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div style={{
-                        width: `${[42, 18, 22, 11][i]}%`,
-                        height: '100%',
-                        background: '#00D2FF',
-                        borderRadius: '2px',
-                      }} />
-                    </div>
-                    <span style={{ fontSize: '12px', color: '#94A3B8', fontFamily: "'Roboto Mono', monospace", minWidth: '40px', textAlign: 'right' }}>{[42, 18, 22, 11][i]}%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{
-            background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(0,210,255,0.12)', borderRadius: '12px',
-            padding: '24px',
-          }}>
-            <h3 style={{ fontSize: '14px', color: '#F5F7FA', marginBottom: '16px', fontFamily: "'Playfair Display', serif" }}>Recent Activity</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[
-                { time: '09:41', msg: 'Capital Call v2026-Q2 Executed', type: 'success' },
-                { time: '09:38', msg: 'K-1 Parsed: Fund 09-K (Apollo)', type: 'info' },
-                { time: '09:30', msg: 'Custodian Reconciliation: Schwab', type: 'success' },
-                { time: '09:15', msg: 'Rebalancing Threshold: Fixed Income', type: 'alert' },
-              ].map((log) => (
-                <div key={log.msg} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <span style={{ fontSize: '10px', color: '#94A3B8', fontFamily: "'Roboto Mono', monospace", marginTop: '2px' }}>{log.time}</span>
-                  <span style={{
-                    fontSize: '12px', color: log.type === 'alert' ? '#EF4444' : log.type === 'success' ? '#22C55E' : '#94A3B8',
-                  }}>{log.msg}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* News Intelligence */}
+        <div style={{ padding: '0 32px 32px' }}>
+          <NewsIntelligence />
         </div>
       </main>
     </div>
