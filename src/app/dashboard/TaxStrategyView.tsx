@@ -1,6 +1,8 @@
 // FamilyOffice AI — TaxStrategyView — lazy loaded
 'use client';
 
+import React from 'react';
+
 export default function TaxStrategyView() {
   const [form, setForm] = useState({
     clientName: "J. Whitmore",
