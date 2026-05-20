@@ -42,7 +42,8 @@ const NAV_ITEMS = [
   { icon:'<>', label:'Portfolio',  view:'portfolio'  },
   { icon:'V',  label:'Analytics',  view:'analytics'  },
   { icon:'[]', label:'Documents', view:'documents'  },
-  { icon:'O',  label:'Advisors',   view:'advisors'   },
+  { icon:'O',  label:'Advisors',    view:'advisors'   },
+  { icon:'▶', label:'Simulate',   view:'simulate'   },
 ];
 
 // SVG Donut Chart
@@ -319,6 +320,15 @@ function AdvisorsView() {
 }
 
 
+function SimulateView() {
+  return (
+    <div style={{ padding:'32px' }}>
+      <h2 style={{ fontSize:'24px', fontFamily:"'Playfair Display',serif", color:'#F5F7FA', marginBottom:'4px' }}>AI Synthesis Prototype</h2>
+      <p style={{ fontSize:'14px', color:'#94A3B8' }}>Wealth Conflict Detection Demo</p>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [active, setActive] = useState('overview');
   const [userEmail] = useState('j.whitmore@familyoffice.com');
@@ -421,6 +431,7 @@ export default function DashboardPage() {
         {active === 'analytics' && <AnalyticsView />}
         {active === 'documents' && <DocumentsView />}
         {active === 'advisors'  && <AdvisorsView />}
+        {active === 'simulate' && <SimulateView />}
       </main>
     </div>
   );
