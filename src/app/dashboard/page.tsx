@@ -327,6 +327,8 @@ function SimulateView() {
   const [reply, setReply] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [advisorNotes, setAdvisorNotes] = useState('');
+  const [reviewBanner, setReviewBanner] = useState<'approve' | 'changes' | null>(null);
 
   const inputStyle: React.CSSProperties = {
     width: '100%', background: 'rgba(3,20,39,0.6)', border: '1px solid rgba(0,210,255,0.15)',
@@ -448,6 +450,7 @@ function SimulateView() {
   };
 
   const handleAnalyze = async () => {
+    setReviewBanner(null);
     setLoading(true);
     setReply('');
     setError('');
@@ -459,6 +462,15 @@ function SimulateView() {
 
   return (
     <div style={{ padding: '32px', maxWidth: '860px' }}>
+      <div style={{ fontSize:'11px', color:'#94A3B8', fontFamily:"'Roboto Mono',monospace", marginBottom:'20px', display:'flex', alignItems:'center', gap:'8px' }}>
+        <span style={{ cursor:'pointer' }}>Landing</span>
+        <span style={{ color:'rgba(0,210,255,0.3)' }}>→</span>
+        <span style={{ cursor:'pointer' }}>Login</span>
+        <span style={{ color:'rgba(0,210,255,0.3)' }}>→</span>
+        <span style={{ cursor:'pointer' }}>Portfolio</span>
+        <span style={{ color:'rgba(0,210,255,0.3)' }}>→</span>
+        <span style={{ color:'#00D2FF' }}>Simulate</span>
+      </div>
       <h2 style={{ fontSize:'24px', fontFamily:"'Playfair Display',serif", color:'#F5F7FA', marginBottom:'4px' }}>AI Synthesis Prototype</h2>
       <p style={{ fontSize:'14px', color:'#94A3B8', marginBottom:'32px' }}>Wealth Conflict Detection Demo</p>
 
@@ -498,9 +510,53 @@ function SimulateView() {
           </pre>
         </div>
       )}
+
+      {/* Human Review */}
+      <div style={{ marginTop:'32px', display:'flex', flexDirection:'column', gap:'16px' }}>
+        <div>
+          <label style={{ display:'block', fontSize:'11px', color:'#94A3B8', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'8px', fontFamily:"'Roboto Mono',monospace" }}>Advisor Notes — add your observations here</label>
+          <textarea
+            value={advisorNotes}
+            onChange={(e) => setAdvisorNotes(e.target.value)}
+            placeholder="Awaiting advisor review..."
+            style={{ width:'100%', background:'rgba(3,20,39,0.6)', border:'1px solid rgba(0,210,255,0.15)', borderRadius:'8px', color:'#F5F7FA', fontSize:'13px', fontFamily:"'Roboto Mono',monospace", padding:'12px 14px', resize:'vertical', height:'80px', outline:'none', lineHeight:1.6 }}
+          />
+        </div>
+
+        <div style={{ display:'flex', gap:'12px', alignItems:'center' }}>
+          <button
+            onClick={() => setReviewBanner('approve')}
+            style={{ background:'rgba(34,197,94,0.12)', border:'1px solid rgba(34,197,94,0.35)', color:'#22C55E', fontSize:'13px', fontWeight:600, padding:'10px 22px', borderRadius:'6px', cursor:'pointer', fontFamily:"'Inter',sans-serif", letterSpacing:'0.05em' }}>
+            Approve Briefing
+          </button>
+          <button
+            onClick={() => setReviewBanner('changes')}
+            style={{ background:'rgba(245,158,11,0.12)', border:'1px solid rgba(245,158,11,0.35)', color:'#F59E0B', fontSize:'13px', fontWeight:600, padding:'10px 22px', borderRadius:'6px', cursor:'pointer', fontFamily:"'Inter',sans-serif", letterSpacing:'0.05em' }}>
+            Request Changes
+          </button>
+        </div>
+
+        {reviewBanner === 'approve' && (
+          <div style={{ padding:'12px 16px', background:'rgba(34,197,94,0.08)', border:'1px solid rgba(34,197,94,0.25)', borderRadius:'8px', fontSize:'13px', color:'#22C55E', fontFamily:"'Roboto Mono',monospace" }}>
+            ✅ Briefing approved by advisor. Ready for client.
+          </div>
+        )}
+        {reviewBanner === 'changes' && (
+          <div style={{ padding:'12px 16px', background:'rgba(245,158,11,0.08)', border:'1px solid rgba(245,158,11,0.25)', borderRadius:'8px', fontSize:'13px', color:'#F59E0B', fontFamily:"'Roboto Mono',monospace" }}>
+            ⚠️ Changes requested. Returned to review queue.
+          </div>
+        )}
+
+        <p style={{ fontSize:'11px', color:'#94A3B8', lineHeight:1.5, marginTop:'4px' }}>
+          No trades have been executed. Human advisor approval is required before any action is taken.
+        </p>
+      </div>
+
+      <p style={{ fontSize:'11px', color:'rgba(148,163,184,0.5)', marginTop:'24px', fontFamily:"'Roboto Mono',monospace" }}>
+        Powered by FamilyOffice AI · Claude Sonnet 4.6 · 3 data streams processed
+      </p>
     </div>
   );
-}
 }
 
 export default function DashboardPage() {
