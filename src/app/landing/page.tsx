@@ -318,6 +318,85 @@ async function fetchTickerData() {
         </div>
       </section>
 
+
+      {/* ── Why FamilyOffice AI ─────────────────────── */}
+      <section id="why" style={{ padding: '80px 2rem', background: 'rgba(11,28,48,0.4)', borderTop: '1px solid rgba(0,210,255,0.06)', borderBottom: '1px solid rgba(0,210,255,0.06)' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 4vw, 40px)', color: '#F5F7FA', textAlign: 'center', marginBottom: '3rem', fontWeight: 600 }}>
+            Why FamilyOffice AI
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            {[
+              { icon: '◈', title: 'Built for Complexity', desc: 'Multi-generational wealth is not a spreadsheet problem. We model the full picture — trusts, entities, custodians, and generations — with precision.' },
+              { icon: '◉', title: 'Always Watching', desc: "AI monitors 24/7 so your advisor doesn't have to. Real-time alerts on threshold breaches, market shifts, and document changes." },
+              { icon: '◇', title: 'Human Oversight Built In', desc: 'Every recommendation requires advisor approval before action. Your family is never removed from critical decisions.' },
+            ].map((card) => (
+              <div key={card.title} style={{ background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0,210,255,0.15)', borderRadius: '12px', padding: '2rem' }}>
+                <span style={{ color: '#00D2FF', fontSize: '22px', display: 'block', marginBottom: '16px' }}>{card.icon}</span>
+                <h3 style={{ color: '#F5F7FA', fontSize: '17px', fontWeight: 500, marginBottom: '10px' }}>{card.title}</h3>
+                <p style={{ color: '#94A3B8', fontSize: '14px', lineHeight: 1.7 }}>{card.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* ── How It Works ─────────────────────────────── */}
+      <section id="how" style={{ padding: '80px 2rem' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 4vw, 40px)', color: '#F5F7FA', textAlign: 'center', marginBottom: '3.5rem', fontWeight: 600 }}>
+            How It Works
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+            {[
+              { step: '1', title: 'Connect your accounts and documents', desc: 'Link custodians, import trust deeds, wills, and partnership agreements into a single secure workspace.' },
+              { step: '2', title: 'AI reads, monitors, and analyses in real time', desc: 'Our models continuously read your portfolio data, market conditions, and document landscape — flagging what matters.' },
+              { step: '3', title: 'Advisor reviews and approves recommendations', desc: 'Every finding surfaces to your advisor first. They review, refine, and approve before any recommendation is shared.' },
+              { step: '4', title: 'Family acts with full confidence', desc: 'Approved recommendations and coordinated action items flow to the family with full context and audit trail.' },
+            ].map((item, i, arr) => (
+              <div key={item.step} style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', paddingBottom: arr.length - 1 === i ? '0' : '40px', position: 'relative' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(0,210,255,0.15)', border: '2px solid rgba(0,210,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ color: '#00D2FF', fontSize: '18px', fontFamily: "'Roboto Mono', monospace", fontWeight: 700 }}>{item.step}</span>
+                  </div>
+                  {arr.length - 1 !== i && <div style={{ width: '2px', flex: 1, minHeight: '40px', background: 'rgba(0,210,255,0.15)', marginTop: '8px' }} />}
+                </div>
+                <div style={{ paddingTop: '10px' }}>
+                  <h3 style={{ color: '#F5F7FA', fontSize: '16px', fontWeight: 500, marginBottom: '6px' }}>{item.title}</h3>
+                  <p style={{ color: '#94A3B8', fontSize: '14px', lineHeight: 1.6 }}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* ── Testimonials ─────────────────────────────── */}
+      <section id="testimonials" style={{ padding: '80px 2rem', background: 'rgba(11,28,48,0.4)', borderTop: '1px solid rgba(0,210,255,0.06)', borderBottom: '1px solid rgba(0,210,255,0.06)' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 4vw, 40px)', color: '#F5F7FA', textAlign: 'center', marginBottom: '3rem', fontWeight: 600 }}>
+            What Our Clients Say
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            {[
+              { quote: "Before FamilyOffice AI, coordinating across four custodians and two trust structures consumed weeks every quarter. Now I have a live picture in minutes. It's changed how our family operates.", author: 'J. Whitmore', role: 'Family Principal' },
+              { quote: "As an advisor, I used to spend half my client calls just gathering data. Now I walk in with a full brief — portfolio view, risk analysis, action items. The time saved is extraordinary.", author: 'A. Chen', role: 'Private Wealth Advisor' },
+            ].map((t) => (
+              <div key={t.author} style={{ background: 'rgba(11,28,48,0.85)', backdropFilter: 'blur(16px)', border: '1px solid rgba(0,210,255,0.12)', borderRadius: '12px', padding: '2rem', position: 'relative' }}>
+                <span style={{ position: 'absolute', top: '16px', left: '20px', fontSize: '48px', color: 'rgba(0,210,255,0.15)', fontFamily: "'Playfair Display', serif", lineHeight: 1 }}>"</span>
+                <p style={{ color: '#F5F7FA', fontSize: '14px', lineHeight: 1.8, fontStyle: 'italic', marginBottom: '1.5rem', paddingTop: '24px' }}>{t.quote}</p>
+                <div style={{ borderTop: '1px solid rgba(0,210,255,0.1)', paddingTop: '1rem' }}>
+                  <div style={{ color: '#F5F7FA', fontSize: '13px', fontWeight: 600 }}>{t.author}</div>
+                  <div style={{ color: '#94A3B8', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '2px' }}>{t.role}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Security ─────────────────────────────── */}
       <section id="security" style={{
         padding: '80px 2rem', background: 'rgba(11,28,48,0.4)',
