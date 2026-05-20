@@ -677,7 +677,10 @@ function DocumentsView() {
   );
 }
 
+
+// DIAGNOSTICmarker123
 function TaxStrategyView() {
+  console.log("TAX STRATEGY MOUNTED v1.1.5");
   const [form, setForm] = useState({
     clientName: "J. Whitmore",
     jurisdiction: "Switzerland",
