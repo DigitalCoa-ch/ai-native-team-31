@@ -1,3 +1,4 @@
+// FamilyOffice AI — v1.1.1 — force redeploy
 'use client';
 
 export const dynamic = 'force-dynamic';
@@ -102,7 +103,7 @@ const NAV_ITEMS = [
   { icon:'V',  label:'Analytics',  view:'analytics'  },
   { icon:'[]', label:'Documents', view:'documents'  },
   { icon:'O',  label:'Advisors',    view:'advisors'   },
-  { icon:'%',  label: "Tax Strategy ✦",
+  { icon:'%',  label: "Tax Strategy ✦", view: 'tax' },
   { icon:'▶', label:'Simulate',   view:'simulate'   },
 ];
 
@@ -505,6 +506,8 @@ function PortfolioView({ chartRange, onChartRange }: { chartRange: string; onCha
             placeholder="Search by name or ticker..."
             style={inputStyle}
           />
+        </div>
+      </div>
 
       {/* ── Tab bar ─────────────────────── */}
       <div style={{ display: 'flex', gap: '2px', marginBottom: '16px', borderBottom: '1px solid rgba(0,210,255,0.1)' }}>
